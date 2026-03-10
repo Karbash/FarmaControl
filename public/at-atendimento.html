@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atendimento - FarmaControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/at-app.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim</div>
+          <div class="ls">Atendimentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Atendimentos</div>
+          <a href="at-dashboard.html" class="nav-item"><span class="material-icons nav-icon">dashboard</span> Dashboard</a>
+          <a href="at-fila.html" class="nav-item"><span class="material-icons nav-icon">queue</span> Fila de Espera</a>
+          <a href="at-pacientes.html" class="nav-item"><span class="material-icons nav-icon">people</span> Pacientes</a>
+          <a href="at-relatorios.html" class="nav-item"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Sistema</div>
+          <a href="dashboard.html" class="nav-item"><span class="material-icons nav-icon">apps</span> Módulos</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair"><span class="material-icons" style="font-size:1.1rem">logout</span></button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1</div>
+      </aside>
+      <main class="main">
+        <div class="ph">
+          <div>
+            <div class="pt">Atendimento</div>
+            <div class="ps" id="at-at-data">Carregando...</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-g" onclick="window.location.href='at-fila.html'">Voltar</button>
+            <button class="btn btn-p" id="btn-iniciar" style="display:none" onclick="atIniciarAtendimento()">Iniciar Atendimento</button>
+            <button class="btn btn-s" onclick="atEncerrarAtendimento()">Encerrar</button>
+          </div>
+        </div>
+
+        <div class="paciente-header">
+          <div class="paciente-avatar" id="at-at-avatar">?</div>
+          <div class="paciente-info">
+            <h2 id="at-at-paciente-nome">Carregando...</h2>
+            <p id="at-at-paciente-info">—</p>
+            <div class="paciente-badges">
+              <span id="at-at-tipo">Consulta</span>
+              <span id="at-at-status"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="etapa-triagem" class="etapa-box">
+          <div class="etapa-titulo"><span class="material-icons">assignment</span> Triagem</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Pressão Arterial</label>
+              <input type="text" id="at-tr-pressao" placeholder="ex: 120/80 mmHg">
+            </div>
+            <div class="form-group">
+              <label>Temperatura</label>
+              <input type="text" id="at-tr-temp" placeholder="ex: 36.5°C">
+            </div>
+            <div class="form-group">
+              <label>Peso (kg)</label>
+              <input type="text" id="at-tr-peso" placeholder="ex: 70">
+            </div>
+            <div class="form-group">
+              <label>Altura (cm)</label>
+              <input type="text" id="at-tr-altura" placeholder="ex: 170">
+            </div>
+            <div class="form-group">
+              <label>Freq. Cardíaca</label>
+              <input type="text" id="at-tr-fc" placeholder="ex: 72 bpm">
+            </div>
+            <div class="form-group">
+              <label>Saturação O2</label>
+              <input type="text" id="at-tr-saturacao" placeholder="ex: 98%">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Queixa Principal</label>
+            <textarea id="at-tr-queixa" rows="2" placeholder="Descreva a queixa do paciente..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Responsável pela Triagem</label>
+            <select id="at-tr-responsavel">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="at-tr-obs" rows="2"></textarea>
+          </div>
+          <button class="btn btn-p" onclick="atSalvarTriagem()">Salvar Triagem</button>
+        </div>
+
+        <div id="etapa-prontuario" class="etapa-box">
+          <div class="etapa-titulo"><span class="material-icons">description</span> Prontuário</div>
+          <div class="form-group">
+            <label>Médico Responsável</label>
+            <select id="at-pr-medico">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Anamnese</label>
+            <textarea id="at-pr-anamnese" rows="4" placeholder="Histórico da doença atual, sintomas, etc."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Exame Físico</label>
+            <textarea id="at-pr-exame" rows="3" placeholder="Achados do exame físico..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Hipótese Diagnóstica</label>
+            <textarea id="at-pr-hipotese" rows="2" placeholder="Diagnóstico presumido..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>CID-10</label>
+            <input type="text" id="at-pr-cid10" placeholder="Digite para buscar CID-10..." oninput="atBuscarCID10(this.value)" autocomplete="off">
+            <div id="at-pr-cid10-resultados" class="at-busca-resultados" style="display:none"></div>
+            <input type="hidden" id="at-pr-cid10-codigo">
+            <div id="at-pr-cid10-selecionado" class="at-item-selecionado" style="display:none">
+              <span class="material-icons" style="font-size:0.9rem;vertical-align:middle">check_circle</span>
+              <span id="at-pr-cid10-nome"></span>
+              <button type="button" onclick="atLimparCID10()" style="background:none;border:none;cursor:pointer;color:var(--md-error);font-size:0.75rem;margin-left:4px">× remover</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Conduta</label>
+            <textarea id="at-pr-conduta" rows="3" placeholder="Tratamento prescrito..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="at-pr-obs" rows="2"></textarea>
+          </div>
+          <button class="btn btn-p" onclick="atSalvarProntuario()">Salvar Prontuário</button>
+        </div>
+
+        <div class="etapa-box">
+          <div class="etapa-titulo"><span class="material-icons">medication</span> Prescrições</div>
+          <p style="font-size:0.8rem;color:var(--md-on-surface-variant);margin-bottom:12px">
+            As prescrições geradas aqui criam uma demanda de dispensação para o módulo de Farmácia.
+          </p>
+          <button class="btn btn-s" id="btn-nova-prescricao" onclick="atAbrirPrescricao()" style="margin-bottom:12px">+ Nova Prescrição</button>
+          <div id="at-prescricoes-lista"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal: Nova Prescrição com busca no estoque -->
+    <div id="modal-nova-prescricao" class="mo">
+      <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+          <div class="modal-title">Nova Prescrição</div>
+          <button class="modal-close" onclick="atCloseModal('modal-nova-prescricao')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Medicamento do Estoque *</label>
+            <input type="text" id="at-np-busca-med" placeholder="Digite para buscar no estoque..." oninput="atBuscarMedEstoque(this.value)" autocomplete="off">
+            <div id="at-np-resultados-med" class="at-busca-resultados" style="display:none"></div>
+            <input type="hidden" id="at-np-medicamento-id">
+            <div id="at-np-med-selecionado" class="at-item-selecionado" style="display:none">
+              <span class="material-icons" style="font-size:0.9rem;vertical-align:middle">check_circle</span>
+              <span id="at-np-med-nome-label"></span>
+              <button type="button" onclick="atLimparMedSelecionado()" style="background:none;border:none;cursor:pointer;color:var(--md-error);font-size:0.75rem;margin-left:4px">× remover</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dosagem</label>
+            <select id="at-np-dosagem">
+              <option value="">Selecione...</option>
+              <option value="500mg">500mg</option>
+              <option value="250mg">250mg</option>
+              <option value="100mg">100mg</option>
+              <option value="50mg">50mg</option>
+              <option value="25mg">25mg</option>
+              <option value="10mg">10mg</option>
+              <option value="5mg">5mg</option>
+              <option value="1g">1g</option>
+              <option value="750mg">750mg</option>
+              <option value="600mg">600mg</option>
+              <option value="400mg">400mg</option>
+              <option value="200mg">200mg</option>
+              <option value="125mg">125mg</option>
+              <option value="100UI">100UI</option>
+              <option value="400UI">400UI</option>
+              <option value="1000UI">1000UI</option>
+              <option value="5ml">5ml</option>
+              <option value="10ml">10ml</option>
+              <option value="15ml">15ml</option>
+              <option value="20ml">20ml</option>
+              <option value="1gota">1gota</option>
+              <option value="2gotas">2gotas</option>
+              <option value="3gotas">3gotas</option>
+              <option value="4gotas">4gotas</option>
+              <option value="5gotas">5gotas</option>
+              <option value="1compressa">1compressa</option>
+              <option value="2compressas">2compressas</option>
+              <option value="1ampola">1ampola</option>
+              <option value="1sachê">1sachê</option>
+              <option value="1sachê">1sachê</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Posologia</label>
+            <select id="at-np-posologia">
+              <option value="">Selecione...</option>
+              <option value="1x ao dia">1x ao dia</option>
+              <option value="2x ao dia">2x ao dia</option>
+              <option value="3x ao dia">3x ao dia</option>
+              <option value="4x ao dia">4x ao dia</option>
+              <option value="5x ao dia">5x ao dia</option>
+              <option value="6x ao dia">6x ao dia</option>
+              <option value="A cada 4 horas">A cada 4 horas</option>
+              <option value="A cada 6 horas">A cada 6 horas</option>
+              <option value="A cada 8 horas">A cada 8 horas</option>
+              <option value="A cada 12 horas">A cada 12 horas</option>
+              <option value="Em jejum">Em jejum</option>
+              <option value="Antes dasrefeições">Antes das refeições</option>
+              <option value="Depois dasrefeições">Depois das refeições</option>
+              <option value="Durante asrefeições">Durante as refeições</option>
+              <option value="Ao deitar">Ao deitar</option>
+              <option value="Pela manhã">Pela manhã</option>
+              <option value="A tarde">À tarde</option>
+              <option value="Pela manhã e à tarde">Pela manhã e à tarde</option>
+              <option value="Pela manhã e à noite">Pela manhã e à noite</option>
+              <option value="A cada 4 horas">A cada 4 horas</option>
+              <option value="Se necessário">Se necessário</option>
+              <option value="Por 3 dias">Por 3 dias</option>
+              <option value="Por 5 dias">Por 5 dias</option>
+              <option value="Por 7 dias">Por 7 dias</option>
+              <option value="Por 10 dias">Por 10 dias</option>
+              <option value="Por 14 dias">Por 14 dias</option>
+              <option value="Por 30 dias">Por 30 dias</option>
+              <option value="Uso contínuo">Uso contínuo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade</label>
+            <input type="number" id="at-np-qtd" value="1" min="1" style="width:100px">
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="at-np-obs" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-g" onclick="atCloseModal('modal-nova-prescricao')">Cancelar</button>
+          <button class="btn btn-p" onclick="atSalvarPrescricao()">Salvar Prescrição</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/at-app.js"></script>
+    <script>
+      // Busca de medicamentos no estoque
+      let _medBuscaTimer = null;
+
+      function atBuscarMedEstoque(q) {
+        clearTimeout(_medBuscaTimer);
+        const resDiv = document.getElementById('at-np-resultados-med');
+        if (!q || q.length < 2) { resDiv.style.display = 'none'; return; }
+        _medBuscaTimer = setTimeout(() => {
+          fetch('/api/medicamentos?busca=' + encodeURIComponent(q))
+            .then(r => r.json())
+            .then(lista => {
+              if (!lista.length) {
+                resDiv.innerHTML = '<div style="padding:10px;color:var(--g400)">Nenhum medicamento encontrado no estoque.</div>';
+              } else {
+                resDiv.innerHTML = lista.slice(0, 10).map(m => `
+                  <div class="at-result-item" onclick="atSelecionarMedEstoque(${m.id}, '${(m.nomeGenerico || m.nomeComercial || '').replace(/'/g, "\\'")}', ${m.qtd}, '${m.dosagem || ''}')" style="cursor:pointer;padding:8px 12px;border-bottom:1px solid var(--g100)">
+                    <strong>${m.nomeGenerico || m.nomeComercial || 'S/nome'}</strong>
+                    ${m.nomeComercial && m.nomeGenerico ? '<span style="color:var(--g400);font-size:0.78rem"> · ' + m.nomeComercial + '</span>' : ''}
+                    <span style="font-size:0.75rem;color:var(--g400);float:right">${m.qtd} ${m.unidade || 'un'}</span>
+                  </div>
+                `).join('');
+              }
+              resDiv.style.display = 'block';
+            })
+            .catch(() => { resDiv.style.display = 'none'; });
+        }, 300);
+      }
+
+      function atSelecionarMedEstoque(id, nome, qtd, dosagem) {
+        document.getElementById('at-np-medicamento-id').value = id;
+        document.getElementById('at-np-busca-med').value = nome;
+        document.getElementById('at-np-resultados-med').style.display = 'none';
+        document.getElementById('at-np-med-nome-label').textContent = nome + ' (estoque: ' + qtd + ')';
+        document.getElementById('at-np-med-selecionado').style.display = 'block';
+        if (dosagem) {
+          document.getElementById('at-np-dosagem').value = dosagem;
+        }
+      }
+
+      function atLimparMedSelecionado() {
+        document.getElementById('at-np-medicamento-id').value = '';
+        document.getElementById('at-np-busca-med').value = '';
+        document.getElementById('at-np-med-selecionado').style.display = 'none';
+        document.getElementById('at-np-dosagem').value = '';
+      }
+
+      // Sobrescreve atSalvarPrescricao para incluir medicamentoId
+      const _atSalvarPrescricaoOrig = atSalvarPrescricao;
+      async function atSalvarPrescricao() {
+        if (!prontuarioAtual) return atToast('Salve o prontuário primeiro!');
+
+        const medId = document.getElementById('at-np-medicamento-id').value;
+        if (!medId) return atToast('Selecione um medicamento do estoque!');
+
+        const dados = {
+          prontuarioId: prontuarioAtual.id,
+          pacienteId: atdAtual.pacienteId,
+          medicamentoId: parseInt(medId),
+          nomeMed: document.getElementById('at-np-busca-med').value.trim(),
+          dosagem: document.getElementById('at-np-dosagem').value.trim(),
+          posologia: document.getElementById('at-np-posologia').value.trim(),
+          quantidade: parseInt(document.getElementById('at-np-qtd').value) || 1,
+          obs: document.getElementById('at-np-obs').value.trim()
+        };
+
+        try {
+          await salvarPrescricao(dados);
+          atToast('Prescrição registrada! Aguardando dispensação pela Farmácia.');
+          atCloseModal('modal-nova-prescricao');
+          atLimparMedSelecionado();
+          document.getElementById('at-np-dosagem').value = '';
+          document.getElementById('at-np-posologia').value = '';
+          document.getElementById('at-np-qtd').value = '1';
+          document.getElementById('at-np-obs').value = '';
+          const ps = await buscarPrescricoes({ prontuarioId: prontuarioAtual.id });
+          prescricoes = ps;
+          atAtualizarPrescricoes();
+        } catch (e) {
+          atToast('Erro ao salvar prescrição!');
+        }
+      }
+
+      // Sobrescreve atAbrirPrescricao para limpar o campo de busca
+      function atAbrirPrescricao() {
+        if (!prontuarioAtual) return atToast('Salve o prontuário primeiro!');
+        atLimparMedSelecionado();
+        document.getElementById('at-np-dosagem').value = '';
+        document.getElementById('at-np-posologia').value = '';
+        document.getElementById('at-np-qtd').value = '1';
+        document.getElementById('at-np-obs').value = '';
+        document.getElementById('at-np-resultados-med').style.display = 'none';
+        atOpenModal('modal-nova-prescricao');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const atdId = params.get('id');
+
+      function initAtendimento() {
+        if (!temAcessoModulo('atendimentos')) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        if (!atdId) {
+          window.location.href = 'at-fila.html';
+          return;
+        }
+        atCarregarAtendimento(atdId);
+      }
+
+      document.addEventListener('authReady', initAtendimento);
+      if (window.usuarioAtual) initAtendimento();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node make_transferencia.js)",
+      "Bash(del \"C:\\\\Users\\\\jorda\\\\OneDrive\\\\Área de Trabalho\\\\FarmaControl\\\\make_transferencia.js\")",
+      "Bash(grep -l \"transferencia.html\" \"C:/Users/jorda/OneDrive/Área de Trabalho/FarmaControl/public/\"*.html)",
+      "Bash(npm install)",
+      "Bash(node -e \"require\\(''./src/database''\\); console.log\\(''DB OK''\\)\")",
+      "Bash(node -e \":*)",
+      "Bash(grep -E '\\\\.html$')",
+      "Bash(grep -E '\\\\.js$')",
+      "Bash(grep -E '\\\\.css$')"
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Geral - FarmaControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim<br />de Divinópolis</div>
+          <div class="ls">Controle de Medicamentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Principal</div>
+          <a href="dashboard.html" class="nav-item"><span class="material-icons nav-icon">apps</span> Módulos</a>
+          <a href="painelgeral.html" class="nav-item active"><span class="material-icons nav-icon">dashboard</span> Painel Geral</a>
+          <a href="estoque.html" class="nav-item"><span class="material-icons nav-icon">inventory_2</span> Estoque</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Movimentações</div>
+          <a href="entrada.html" class="nav-item"><span class="material-icons nav-icon">add_circle</span> Dar Entrada</a>
+          <a href="saida.html" class="nav-item"><span class="material-icons nav-icon">remove_circle</span> Dar Baixa</a>
+          <a href="transferencia.html" class="nav-item"><span class="material-icons nav-icon">swap_horiz</span> Transferência</a>
+          <a href="historico.html" class="nav-item"><span class="material-icons nav-icon">history</span> Histórico</a>
+        </nav>
+        <nav class="nav-sec" id="nav-atendimentos" style="display:none">
+          <div class="nav-lbl">Atendimentos</div>
+          <a href="at-dashboard.html" class="nav-item"><span class="material-icons nav-icon">medical_services</span> Atendimentos</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Controle</div>
+          <a href="alertas.html" class="nav-item"><span class="material-icons nav-icon">warning</span> Alertas</a>
+          <a href="relatorios.html" class="nav-item"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+          <a href="auditoria.html" class="nav-item"><span class="material-icons nav-icon">manage_search</span> Auditoria</a>
+          <a href="cadastros.html" class="nav-item"><span class="material-icons nav-icon">settings</span> Cadastros</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair">
+            <span class="material-icons" style="font-size:1.1rem">logout</span>
+          </button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1 · ICM Maanaim Divinópolis</div>
+      </aside>
+      <main class="main">
+        <div class="ph">
+          <div>
+            <div class="pt">Painel Geral</div>
+            <div class="ps">Ambulatório Maanaim de Divinópolis · <span id="data-atual"></span></div>
+          </div>
+          <a href="entrada.html" class="btn btn-p">+ Dar Entrada</a>
+        </div>
+        <div id="alerta-vencido"></div>
+        <div id="alerta-proximo"></div>
+        <div class="cg">
+          <div class="sc red">
+            <div class="sc-acc"></div>
+            <div class="sc-lbl">Registros</div>
+            <div class="sc-val" id="total-registros">0</div>
+            <div class="sc-sub">entradas cadastradas</div>
+          </div>
+          <div class="sc">
+            <div class="sc-acc"></div>
+            <div class="sc-lbl">Total Unidades</div>
+            <div class="sc-val" id="total-unidades">0</div>
+            <div class="sc-sub">em estoque</div>
+          </div>
+          <div class="sc warn">
+            <div class="sc-acc"></div>
+            <div class="sc-lbl">Estoque Crítico</div>
+            <div class="sc-val" id="estoque-critico">0</div>
+            <div class="sc-sub">abaixo do mínimo</div>
+          </div>
+          <div class="sc danger">
+            <div class="sc-acc"></div>
+            <div class="sc-lbl">Vencidos/Próximos</div>
+            <div class="sc-val" id="vencidos-proximos">0</div>
+            <div class="sc-sub" id="vencidos-sub">0 vencido(s)</div>
+          </div>
+          <div class="sc purp">
+            <div class="sc-acc"></div>
+            <div class="sc-lbl">Controlados</div>
+            <div class="sc-val" id="controlados">0</div>
+            <div class="sc-sub">atenção especial</div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="cp">
+            <div class="cph">
+              <div class="cpt">
+                <span class="material-icons" style="font-size:1rem">history</span>
+                Últimas Movimentações
+              </div>
+              <a href="historico.html" class="btn btn-sm btn-s">Ver tudo</a>
+            </div>
+            <div id="ultimas-movimentacoes"></div>
+          </div>
+          <div class="cp">
+            <div class="cph">
+              <div class="cpt">
+                <span class="material-icons" style="font-size:1rem">inventory</span>
+                Situação do Estoque
+              </div>
+            </div>
+            <div style="padding:13px 17px" id="situacao-estoque"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("data-atual").textContent = new Date().toLocaleDateString("pt-BR", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric"
+      });
+    </script>
+  </body>
+</html>

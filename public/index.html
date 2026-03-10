@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0;url=login.html" />
+    <title>FarmaControl</title>
+  </head>
+  <body>
+    <script>
+      const usuarioLogado = localStorage.getItem("farmacontrol_usuario");
+      if (usuarioLogado) {
+        window.location.href = "painelgeral.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    </script>
+  </body>
+</html>

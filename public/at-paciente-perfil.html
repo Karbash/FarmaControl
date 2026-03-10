@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil do Paciente - FarmaControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/at-app.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim</div>
+          <div class="ls">Atendimentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Atendimentos</div>
+          <a href="at-dashboard.html" class="nav-item"><span class="material-icons nav-icon">dashboard</span> Dashboard</a>
+          <a href="at-fila.html" class="nav-item"><span class="material-icons nav-icon">queue</span> Fila de Espera</a>
+          <a href="at-pacientes.html" class="nav-item active"><span class="material-icons nav-icon">people</span> Pacientes</a>
+          <a href="at-relatorios.html" class="nav-item"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Sistema</div>
+          <a href="dashboard.html" class="nav-item"><span class="material-icons nav-icon">apps</span> Módulos</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair"><span class="material-icons" style="font-size:1.1rem">logout</span></button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1</div>
+      </aside>
+      <main class="main">
+        <div class="ph">
+          <div>
+            <div class="pt" id="perfil-nome-titulo">Perfil do Paciente</div>
+            <div class="ps">Dados cadastrais e histórico médico</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-g" onclick="window.location.href='at-pacientes.html'">
+              <span class="material-icons" style="font-size:1rem;vertical-align:middle">arrow_back</span> Voltar
+            </button>
+            <button class="btn btn-s" id="btn-editar-pac" onclick="abrirEditar()">
+              <span class="material-icons" style="font-size:1rem;vertical-align:middle">edit</span> Editar
+            </button>
+            <button class="btn btn-p" id="btn-novo-at-perfil" onclick="abrirNovoAtendimento()">+ Atendimento</button>
+          </div>
+        </div>
+
+        <!-- Card de dados do paciente -->
+        <div class="cp" style="margin-bottom:16px" id="card-dados"></div>
+
+        <!-- Histórico de atendimentos -->
+        <div class="cp">
+          <div class="cph">
+            <div class="cpt"><span class="material-icons" style="font-size:1rem;vertical-align:middle">history</span> Histórico de Atendimentos</div>
+          </div>
+          <div id="historico-lista" style="padding:0"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal: Editar Paciente -->
+    <div id="modal-editar-paciente" class="mo">
+      <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+          <div class="modal-title">Editar Paciente</div>
+          <button class="modal-close" onclick="atCloseModal('modal-editar-paciente')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="at-ep-id">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="at-ep-nome">
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>CPF</label>
+              <input type="text" id="at-ep-cpf">
+            </div>
+            <div class="form-group">
+              <label>Data Nasc.</label>
+              <input type="date" id="at-ep-nascimento">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Sexo</label>
+              <select id="at-ep-sexo">
+                <option value="">Selecione...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Telefone</label>
+              <input type="text" id="at-ep-telefone">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Endereço</label>
+            <input type="text" id="at-ep-endereco">
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="at-ep-obs" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-g" onclick="atCloseModal('modal-editar-paciente')">Cancelar</button>
+          <button class="btn btn-p" onclick="salvarEditarPerfil()">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Novo Atendimento -->
+    <div id="modal-novo-atendimento" class="mo">
+      <div class="modal" style="max-width:480px">
+        <div class="modal-header">
+          <div class="modal-title">Novo Atendimento</div>
+          <button class="modal-close" onclick="atCloseModal('modal-novo-atendimento')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="at-paciente-selecionado" id="at-nat-paciente-nome">—</div>
+          <input type="hidden" id="at-nat-paciente">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="at-nat-data">
+            </div>
+            <div class="form-group">
+              <label>Hora</label>
+              <input type="time" id="at-nat-hora">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="at-nat-tipo">
+              <option value="consulta">Consulta</option>
+              <option value="retorno">Retorno</option>
+              <option value="encaixe">Encaixe</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="at-nat-emergencia" style="width:auto;margin-right:8px">
+              <span style="color:var(--md-error);font-weight:600"><span class="material-icons" style="font-size:1rem;vertical-align:middle">warning</span> Emergência</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Responsável pelo Atendimento *</label>
+            <select id="at-nat-responsavel">
+              <option value="">Carregando equipe...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="at-nat-obs" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-g" onclick="atCloseModal('modal-novo-atendimento')">Cancelar</button>
+          <button class="btn btn-p" onclick="atSalvarNovoAtendimento()">Criar Atendimento</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/at-app.js"></script>
+    <script>
+      const _urlParams = new URLSearchParams(window.location.search);
+      const _pacId = _urlParams.get('id');
+      let _pacAtual = null;
+
+      function atIdadeFull(dataNasc) {
+        if (!dataNasc) return '—';
+        const today = new Date();
+        const birth = new Date(dataNasc + 'T12:00:00');
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        return age + ' ano(s) · ' + new Date(dataNasc + 'T12:00:00').toLocaleDateString('pt-BR');
+      }
+
+      function renderDados(p) {
+        const sexoLabel = p.sexo === 'M' ? 'Masculino' : p.sexo === 'F' ? 'Feminino' : '—';
+        document.getElementById('perfil-nome-titulo').textContent = p.nome;
+        document.getElementById('card-dados').innerHTML = `
+          <div class="paciente-header" style="margin:0;border-radius:0">
+            <div class="paciente-avatar">${(p.nome || '?').charAt(0).toUpperCase()}</div>
+            <div class="paciente-info">
+              <h2>${p.nome} ${!p.ativo ? '<span class="bdg b-err" style="margin-left:8px">Inativo</span>' : ''}</h2>
+              <p>${p.cpf ? 'CPF: ' + p.cpf + ' · ' : ''}${sexoLabel} · ${atIdadeFull(p.dataNascimento)}</p>
+              <p>${p.telefone ? '<span class="material-icons" style="font-size:0.9rem;vertical-align:middle">phone</span> ' + p.telefone : ''} ${p.endereco ? ' · <span class="material-icons" style="font-size:0.9rem;vertical-align:middle">place</span> ' + p.endereco : ''}</p>
+              ${p.obs ? '<p style="font-style:italic;color:var(--md-on-surface-variant)">' + p.obs + '</p>' : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderHistorico(lista) {
+        const div = document.getElementById('historico-lista');
+        if (!lista.length) {
+          div.innerHTML = '<div style="padding:32px;text-align:center;color:var(--md-on-surface-variant)">Nenhum atendimento registrado.</div>';
+          return;
+        }
+        div.innerHTML = lista.map(a => `
+          <div class="at-list-item" onclick="window.location.href='at-atendimento.html?id=${a.id}'" style="cursor:pointer">
+            <div class="at-list-avatar" style="background:var(--md-secondary-container);color:var(--md-on-secondary-container)">
+              <span class="material-icons" style="font-size:1.1rem">${a.status === 'encerrado' ? 'check_circle' : 'pending'}</span>
+            </div>
+            <div class="at-list-info">
+              <div class="at-list-nome">${atFormatData(a.data)} · ${a.tipo || 'Consulta'} ${a.emergencia ? '<span class="bdg b-emergencia">EMERGÊNCIA</span>' : ''}</div>
+              <div class="at-list-meta">${a.medicoNome ? 'Dr(a). ' + a.medicoNome : (a.responsavel ? 'Resp.: ' + a.responsavel : '—')} · ${a.hora || '--:--'}</div>
+            </div>
+            <div class="at-list-actions">
+              ${atStatusBadge(a.status)}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function abrirEditar() {
+        if (!_pacAtual) return;
+        document.getElementById('at-ep-id').value = _pacAtual.id;
+        document.getElementById('at-ep-nome').value = _pacAtual.nome;
+        document.getElementById('at-ep-cpf').value = _pacAtual.cpf || '';
+        document.getElementById('at-ep-nascimento').value = _pacAtual.dataNascimento || '';
+        document.getElementById('at-ep-sexo').value = _pacAtual.sexo || '';
+        document.getElementById('at-ep-telefone').value = _pacAtual.telefone || '';
+        document.getElementById('at-ep-endereco').value = _pacAtual.endereco || '';
+        document.getElementById('at-ep-obs').value = _pacAtual.obs || '';
+        atOpenModal('modal-editar-paciente');
+      }
+
+      function salvarEditarPerfil() {
+        const id = document.getElementById('at-ep-id').value;
+        const nome = document.getElementById('at-ep-nome').value.trim();
+        if (!nome) return atToast('Nome é obrigatório!');
+        const dados = {
+          nome,
+          cpf: document.getElementById('at-ep-cpf').value.trim(),
+          dataNascimento: document.getElementById('at-ep-nascimento').value,
+          sexo: document.getElementById('at-ep-sexo').value,
+          telefone: document.getElementById('at-ep-telefone').value.trim(),
+          endereco: document.getElementById('at-ep-endereco').value.trim(),
+          obs: document.getElementById('at-ep-obs').value.trim()
+        };
+        atualizarPaciente(id, dados)
+          .then(() => {
+            atToast('Dados atualizados!');
+            atCloseModal('modal-editar-paciente');
+            carregarPerfil();
+          })
+          .catch(() => atToast('Erro ao atualizar!'));
+      }
+
+      function abrirNovoAtendimento() {
+        if (!_pacAtual) return;
+        atNovoAtendimento(_pacAtual.id, _pacAtual.nome);
+      }
+
+      async function carregarPerfil() {
+        if (!_pacId) { window.location.href = 'at-pacientes.html'; return; }
+        try {
+          _pacAtual = await buscarPaciente(_pacId);
+          renderDados(_pacAtual);
+          const ats = await buscarAtendimentos({ pacienteId: _pacId });
+          renderHistorico(ats);
+        } catch (e) {
+          atToast('Erro ao carregar perfil!');
+        }
+      }
+
+      function initPerfil() {
+        if (!temAcessoModulo('atendimentos')) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        atCarregarEquipe().then(() => {
+          atPopularSelectResponsavel('at-nat-responsavel');
+        });
+        carregarPerfil();
+      }
+
+      document.addEventListener('authReady', initPerfil);
+      if (window.usuarioAtual) initPerfil();
+    </script>
+  </body>
+</html>

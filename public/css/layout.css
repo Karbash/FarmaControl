@@ -1,0 +1,121 @@
+/* ============================================================
+   LAYOUT - Sidebar e Área Principal
+   ============================================================ */
+
+/* Main Content */
+.main {
+  flex: 1;
+  padding: 26px 30px;
+  overflow-y: auto;
+  max-width: calc(100vw - 260px);
+}
+
+.ph {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+/* Sidebar */
+.sb {
+  width: 260px;
+  background: var(--red);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sb-logo {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+}
+
+.sb-logo img {
+  width: 148px;
+  margin-bottom: 8px;
+  filter: brightness(0) invert(1);
+}
+
+.sb-logo .lt {
+  font-family: "DM Serif Display", serif;
+  font-size: 1rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.sb-logo .ls {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-top: 3px;
+}
+
+.sb-foot {
+  margin-top: auto;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Navigation */
+.nav-sec {
+  padding: 14px 11px 4px;
+}
+
+.nav-lbl {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 0 8px;
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.84rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 0.9rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.material-icons.nav-icon {
+  font-size: 1.1rem;
+  width: auto;
+}

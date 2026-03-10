@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saída - FarmaControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/at-app.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim<br />de Divinópolis</div>
+          <div class="ls">Controle de Medicamentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Principal</div>
+          <a href="painelgeral.html" class="nav-item"><span class="material-icons nav-icon">dashboard</span> Painel Geral</a>
+          <a href="estoque.html" class="nav-item"><span class="material-icons nav-icon">inventory_2</span> Estoque</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Movimentações</div>
+          <a href="entrada.html" class="nav-item"><span class="material-icons nav-icon">add_circle</span> Dar Entrada</a>
+          <a href="saida.html" class="nav-item active"><span class="material-icons nav-icon">remove_circle</span> Dar Baixa</a>
+          <a href="transferencia.html" class="nav-item"><span class="material-icons nav-icon">swap_horiz</span> Transferência</a>
+          <a href="historico.html" class="nav-item"><span class="material-icons nav-icon">history</span> Histórico</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Controle</div>
+          <a href="alertas.html" class="nav-item"><span class="material-icons nav-icon">warning</span> Alertas</a>
+          <a href="relatorios.html" class="nav-item"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+          <a href="auditoria.html" class="nav-item"><span class="material-icons nav-icon">manage_search</span> Auditoria</a>
+          <a href="cadastros.html" class="nav-item"><span class="material-icons nav-icon">settings</span> Cadastros</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair"><span class="material-icons" style="font-size:1.1rem">logout</span></button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1 · ICM Maanaim Divinópolis</div>
+      </aside>
+      <main class="main">
+        <div class="ph">
+          <div>
+            <div class="pt">Farmácia · Saída de Medicamentos</div>
+            <div class="ps">Dispensação de prescrições e baixa manual no estoque</div>
+          </div>
+        </div>
+
+        <!-- Dispensações pendentes de prescrições médicas -->
+        <div class="cp" style="margin-bottom:20px">
+          <div class="cph">
+            <div class="cpt">
+              <span class="material-icons" style="font-size:1rem;vertical-align:middle">pending_actions</span>
+              Prescrições Aguardando Dispensação
+            </div>
+            <button class="btn btn-sm btn-s" onclick="carregarPrescricoesPendentes()">
+              <span class="material-icons" style="font-size:0.9rem;vertical-align:middle">refresh</span> Atualizar
+            </button>
+          </div>
+          <div id="prescricoes-pendentes-lista" style="padding:0">
+            <div style="padding:24px;text-align:center;color:var(--md-on-surface-variant)">Carregando...</div>
+          </div>
+        </div>
+
+        <!-- Baixa Manual no Estoque -->
+        <div class="cp" style="margin-bottom:20px">
+          <div class="cph">
+            <div class="cpt">
+              <span class="material-icons" style="font-size:1rem;vertical-align:middle">edit_note</span>
+              Baixa Manual no Estoque
+            </div>
+          </div>
+          <div style="padding:16px">
+            <div class="fgrid c2">
+              <div class="fg cf">
+                <label>Medicamento *</label>
+                <select id="s2-med" onchange="updSI2()">
+                  <option value="">Selecione o medicamento...</option>
+                </select>
+                <div id="s2-info" style="font-size:0.72rem;color:var(--g400);margin-top:3px"></div>
+              </div>
+              <div class="fg">
+                <label>Quantidade *</label>
+                <input type="number" id="s2-qtd" min="1" placeholder="0" />
+              </div>
+              <div class="fg">
+                <label>Motivo da Baixa *</label>
+                <select id="s2-motivo" onchange="togglePaciente('s2')">
+                  <option value="Dispensação">Dispensação</option>
+                  <option value="Vencido">Vencido</option>
+                  <option value="Estragado / Danificado">Estragado / Danificado</option>
+                  <option value="Perda">Perda</option>
+                  <option value="Devolução ao Fabricante">Devolução ao Fabricante</option>
+                  <option value="Descarte">Descarte</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div class="fg" id="s2-paciente-group" style="display:none">
+                <label>Nome do Paciente</label>
+                <input type="text" id="s2-paciente" placeholder="Nome do paciente" />
+              </div>
+              <div class="fg">
+                <label>Data da Baixa *</label>
+                <input type="date" id="s2-dt" />
+              </div>
+              <div class="fg cf">
+                <label>Responsável pela Baixa *</label>
+                <input type="text" id="s2-resp" placeholder="Nome completo" />
+              </div>
+            </div>
+            <div id="s2-err" style="color:var(--red);font-size:0.76rem;margin-top:10px;display:none;padding:8px 12px;background:var(--red-soft);border-radius:6px"></div>
+            <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid var(--g100)">
+              <button class="btn btn-p" style="background:#c0392b" onclick="salvarS2()">
+                <span class="material-icons" style="font-size:1rem">check</span> Confirmar Baixa
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById('s2-dt').value = hoje();
+
+      // ── Dispensações pendentes de prescrições médicas ─────────────
+      async function carregarPrescricoesPendentes() {
+        const div = document.getElementById('prescricoes-pendentes-lista');
+        try {
+          const r = await fetch('/api/prescricoes?dispensado=0');
+          if (r.status === 403) {
+            div.innerHTML = '<div style="padding:24px;text-align:center;color:var(--md-on-surface-variant)">Sem permissão para visualizar prescrições.</div>';
+            return;
+          }
+          if (!r.ok) throw new Error(r.status);
+          const lista = await r.json();
+
+          if (!lista.length) {
+            div.innerHTML = '<div style="padding:24px;text-align:center;color:var(--md-on-surface-variant)"><span class="material-icons" style="font-size:2rem;display:block;margin-bottom:8px;color:var(--md-primary)">check_circle</span>Nenhuma prescrição pendente.</div>';
+            return;
+          }
+
+          div.innerHTML = lista.map(p => `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--g100)">
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:0.88rem">${p.nomeMed || 'Medicamento não especificado'}</div>
+                <div style="font-size:0.76rem;color:var(--md-on-surface-variant);margin-top:2px">
+                  Paciente: <strong>${p.pacienteNome || '—'}</strong>
+                  ${p.dosagem ? ' · ' + p.dosagem : ''}
+                  ${p.posologia ? ' · ' + p.posologia : ''}
+                  · Qtd: <strong>${p.quantidade}</strong>
+                </div>
+                <div style="font-size:0.72rem;color:var(--g400);margin-top:2px">
+                  Atendimento: ${p.atendimentoData ? new Date(p.atendimentoData + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
+                  ${p.obs ? ' · ' + p.obs : ''}
+                </div>
+              </div>
+              <div style="flex-shrink:0">
+                ${p.medicamentoId
+                  ? `<button class="btn btn-sm btn-p" onclick="dispensarItem(${p.id})">
+                       <span class="material-icons" style="font-size:0.85rem;vertical-align:middle">medication</span> Dispensar
+                     </button>`
+                  : `<span class="bdg b-err" title="Medicamento não vinculado ao estoque">Sem estoque</span>`
+                }
+              </div>
+            </div>
+          `).join('');
+        } catch (e) {
+          div.innerHTML = '<div style="padding:24px;text-align:center;color:var(--md-error)">Erro ao carregar prescrições pendentes.</div>';
+        }
+      }
+
+      async function dispensarItem(id) {
+        const responsavel = window.usuarioAtual?.nome;
+        if (!responsavel) return toast('Usuário não identificado!');
+        try {
+          const r = await fetch('/api/prescricoes/' + id + '/dispensar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ responsavel })
+          });
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            toast('Erro: ' + (err.error || 'Não foi possível dispensar'));
+            return;
+          }
+          toast('Medicamento dispensado com sucesso!');
+          carregarPrescricoesPendentes();
+        } catch (e) {
+          toast('Erro ao dispensar!');
+        }
+      }
+
+      document.addEventListener('authReady', function() {
+        carregarPrescricoesPendentes();
+        const resp = document.getElementById('s2-resp');
+        if (resp && window.usuarioAtual?.nome) resp.value = window.usuarioAtual.nome;
+      });
+      if (window.usuarioAtual) {
+        carregarPrescricoesPendentes();
+        const resp = document.getElementById('s2-resp');
+        if (resp && window.usuarioAtual.nome) resp.value = window.usuarioAtual.nome;
+      }
+    </script>
+  </body>
+</html>

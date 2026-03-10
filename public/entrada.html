@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrada - FarmaControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim<br />de Divinópolis</div>
+          <div class="ls">Controle de Medicamentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Principal</div>
+          <a href="painelgeral.html" class="nav-item"><span class="material-icons nav-icon">dashboard</span> Painel Geral</a>
+          <a href="estoque.html" class="nav-item"><span class="material-icons nav-icon">inventory_2</span> Estoque</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Movimentações</div>
+          <a href="entrada.html" class="nav-item active"><span class="material-icons nav-icon">add_circle</span> Dar Entrada</a>
+          <a href="saida.html" class="nav-item"><span class="material-icons nav-icon">remove_circle</span> Dar Baixa</a>
+          <a href="transferencia.html" class="nav-item"><span class="material-icons nav-icon">swap_horiz</span> Transferência</a>
+          <a href="historico.html" class="nav-item"><span class="material-icons nav-icon">history</span> Histórico</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Controle</div>
+          <a href="alertas.html" class="nav-item"><span class="material-icons nav-icon">warning</span> Alertas</a>
+          <a href="relatorios.html" class="nav-item"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+          <a href="auditoria.html" class="nav-item"><span class="material-icons nav-icon">manage_search</span> Auditoria</a>
+          <a href="cadastros.html" class="nav-item"><span class="material-icons nav-icon">settings</span> Cadastros</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair">
+            <span class="material-icons" style="font-size:1.1rem">logout</span>
+          </button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1 · ICM Maanaim Divinópolis</div>
+      </aside>
+      <main class="main">
+        <div class="ph">
+          <div>
+            <div class="pt">Dar Entrada de Medicamento</div>
+            <div class="ps">Registre a entrada de medicamentos no estoque</div>
+          </div>
+        </div>
+
+        <!-- Ações rápidas: vincular / código de barras -->
+        <div class="bc-row">
+          <div class="bc-sec">
+            <span class="material-icons nav-icon" style="color:var(--g400)">link</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.7rem;color:var(--g600);font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px">Vincular a existente</div>
+              <select id="e-vincular" onchange="vincularMed()" style="width:100%">
+                <option value="">— Medicamento novo —</option>
+              </select>
+            </div>
+          </div>
+          <div class="bc-sec">
+            <span class="material-icons nav-icon">camera_alt</span>
+            <div class="bc-wrap">
+              <span class="bc-ico">|||||</span>
+              <input type="text" id="bc-inp" placeholder="Digite ou escaneie o código de barras..." onkeydown="if(event.key==='Enter') procBC();" />
+            </div>
+            <button class="btn btn-s" onclick="procBC()">Ler Código</button>
+          </div>
+        </div>
+
+        <div id="e-vinc-msg" style="font-size:.74rem;margin:0 0 10px;padding:7px 12px;background:#eaf7ef;border-radius:6px;border:1px solid #abebc6;display:none"></div>
+        <div id="bc-msg" style="font-size:0.74rem;margin:-8px 0 13px;padding:0 4px;color:var(--g400)"></div>
+        <div class="dvd"><span id="e-dvd-txt">ou preencha manualmente</span></div>
+
+        <!-- Formulário de entrada -->
+        <div class="cp">
+          <div class="cph">
+            <div class="cpt">
+              <span class="material-icons" style="font-size:1rem">add_circle</span>
+              Dados do Medicamento
+            </div>
+          </div>
+          <div style="padding:20px">
+            <input type="hidden" id="e-med-id" value="">
+            <input type="hidden" id="e-med-qtd-atual" value="0">
+            <div class="fgrid c2">
+              <div class="fg cf">
+                <label>Nome Genérico (Princípio Ativo) *</label>
+                <input type="text" id="e-gen" placeholder="Ex: Amoxicilina" />
+              </div>
+              <div class="fg">
+                <label>Nome Comercial *</label>
+                <input type="text" id="e-com" placeholder="Ex: Amoxil / 500mg" />
+              </div>
+              <div class="fg">
+                <label>Classe Terapêutica</label>
+                <select id="e-cls">
+                  <option value="">Selecione...</option>
+                  <option>Analgesico</option>
+                  <option>Anti-inflamatorio</option>
+                  <option>Antibiotico</option>
+                  <option>Antifungico</option>
+                  <option>Antiviral</option>
+                  <option>Antihipertensivo</option>
+                  <option>Antidiabetico</option>
+                  <option>Antidepressivo</option>
+                  <option>Ansiolitico</option>
+                  <option>Antiepileptico</option>
+                  <option>Antipsicotico</option>
+                  <option>Broncodilatador</option>
+                  <option>Corticosteroide</option>
+                  <option>Diuretico</option>
+                  <option>Gastroprotetor</option>
+                  <option>Hipolipemiante</option>
+                  <option>Laxante</option>
+                  <option>Antiulceroso</option>
+                  <option>Antialergico</option>
+                  <option>Antitussigeno</option>
+                  <option>Expectorante</option>
+                  <option>Mucolitico</option>
+                  <option>Vitamina / Suplemento</option>
+                  <option>Antianemico</option>
+                  <option>Anticoagulante</option>
+                  <option>Antiplaquetario</option>
+                  <option>Antiemetico</option>
+                  <option>Antidiarreico</option>
+                  <option>Antiparasitario</option>
+                  <option>Hormonio</option>
+                  <option>Anticoncepcional</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Forma Farmacêutica *</label>
+                <select id="e-forma">
+                  <option value="">Selecione...</option>
+                  <option>Comprimido</option>
+                  <option>Comprimido revestido</option>
+                  <option>Comprimido efervescente</option>
+                  <option>Comprimido orodispersível</option>
+                  <option>Comprimido mastigável</option>
+                  <option>Comprimido de liberação prolongada</option>
+                  <option>Fracionário</option>
+                  <option>Cápsula dura</option>
+                  <option>Cápsula mole</option>
+                  <option>Solução oral</option>
+                  <option>Solução injetável</option>
+                  <option>Suspensão oral</option>
+                  <option>Suspensão injetável</option>
+                  <option>Suspensão aerossol</option>
+                  <option>Pó para suspensão</option>
+                  <option>Pó para suspensão injetável</option>
+                  <option>Pomada</option>
+                  <option>Creme</option>
+                  <option>Gel</option>
+                  <option>Xarope</option>
+                  <option>Spray</option>
+                  <option>Emulsão oral</option>
+                  <option>Solução spray</option>
+                  <option>Pastilha</option>
+                  <option>Drágea</option>
+                  <option>Filme</option>
+                  <option>Sachê</option>
+                  <option>Granulado orodispersível</option>
+                  <option>Solução para infusão intravenosa</option>
+                  <option>Colírio</option>
+                  <option>Otológico</option>
+                  <option>Nasal</option>
+                  <option>Inalatório</option>
+                  <option>Supositório</option>
+                  <option>Enema</option>
+                  <option>Adesivo transdérmico</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Dosagem / Concentração *</label>
+                <select id="e-dos">
+                  <option value="">Selecione...</option>
+                  <option>1mg</option><option>2mg</option><option>2,5mg</option>
+                  <option>3mg</option><option>4mg</option><option>5mg</option>
+                  <option>6mg</option><option>7,5mg</option><option>8mg</option>
+                  <option>10mg</option><option>12,5mg</option><option>15mg</option>
+                  <option>20mg</option><option>25mg</option><option>30mg</option>
+                  <option>40mg</option><option>50mg</option><option>60mg</option>
+                  <option>75mg</option><option>80mg</option><option>100mg</option>
+                  <option>125mg</option><option>150mg</option><option>200mg</option>
+                  <option>250mg</option><option>300mg</option><option>400mg</option>
+                  <option>500mg</option><option>600mg</option><option>750mg</option>
+                  <option>1g</option><option>1,5g</option><option>2g</option>
+                  <option>5g</option><option>10g</option>
+                  <option>0,5%</option><option>1%</option><option>2%</option>
+                  <option>2,5%</option><option>3%</option><option>4%</option>
+                  <option>5%</option><option>10%</option><option>20%</option><option>0,9%</option>
+                  <option>5mg/mL</option><option>10mg/mL</option><option>20mg/mL</option>
+                  <option>25mg/mL</option><option>40mg/mL</option><option>50mg/mL</option>
+                  <option>100mg/mL</option><option>200mg/mL</option>
+                  <option>250mg/5mL</option><option>400mg/5mL</option><option>500mg/5mL</option>
+                  <option>5mg/5mL</option><option>120mg/5mL</option>
+                  <option>UI</option><option>UI/mL</option>
+                  <option>Comprimidos</option><option>Fracionario</option><option>Outro</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Número do Lote *</label>
+                <input type="text" id="e-lot" placeholder="Ex: LT2025A001" />
+              </div>
+              <div class="fg">
+                <label>Data de Validade *</label>
+                <input type="date" id="e-val" />
+              </div>
+              <div class="fg">
+                <label>Fabricante *</label>
+                <select id="e-fab">
+                  <option value="">Selecione...</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Origem *</label>
+                <select id="e-ori">
+                  <option value="Doação">Doação</option>
+                  <option value="Aquisição Maanaim">Aquisição Maanaim</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Quantidade Recebida *</label>
+                <input type="number" id="e-qtd" min="0" placeholder="0" />
+              </div>
+              <div class="fg">
+                <label>Unidade</label>
+                <select id="e-uni">
+                  <option value="">Selecione...</option>
+                  <option>comprimido</option><option>capsula</option>
+                  <option>ampola</option><option>frasco</option>
+                  <option>tubo</option><option>sachê</option>
+                  <option>blister</option><option>caixa</option>
+                  <option>unidade</option><option>mL</option>
+                  <option>g</option><option>mg</option><option>Outro</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Localização *</label>
+                <select id="e-loc">
+                  <option value="">Selecione a localização...</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Estoque Mínimo (alerta)</label>
+                <input type="number" id="e-min" min="0" value="5" />
+              </div>
+              <div class="fg">
+                <label>Medicamento Controlado?</label>
+                <select id="e-ctrl">
+                  <option value="false">Não</option>
+                  <option value="true">Sim — Medicamento Controlado</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Responsável pelo Recebimento *</label>
+                <select id="e-resp">
+                  <option value="">Selecione...</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>Data do Recebimento *</label>
+                <input type="date" id="e-data" />
+              </div>
+              <div class="fg cf">
+                <label>Observações</label>
+                <input type="text" id="e-obs" placeholder="Ex: NF 1234, doação..." />
+              </div>
+            </div>
+            <div id="e-err" style="color:var(--red);font-size:0.76rem;margin-top:10px;display:none;padding:8px 12px;background:var(--red-soft);border-radius:6px"></div>
+            <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:16px;padding-top:15px;border-top:1px solid var(--md-outline-variant)">
+              <button class="btn btn-g" onclick="limparE()">Limpar</button>
+              <button class="btn btn-p" onclick="salvarE()">
+                <span class="material-icons" style="font-size:1rem">check</span>
+                Confirmar Entrada
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+      document.getElementById("e-data").value = hoje();
+      popularSelectFabricantes();
+      popularSelectLocais();
+      popularSelectOrigem();
+      popularSelectResponsavel();
+      popularSelectVincular();
+    </script>
+  </body>
+</html>

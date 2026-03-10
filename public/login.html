@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmaControl - Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #c8102e 0%, #9b0b22 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-container {
+        background: #fff;
+        border-radius: 16px;
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .login-logo {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .login-logo img {
+        width: 120px;
+        margin-bottom: 12px;
+      }
+      .login-logo .lt {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+      }
+      .login-logo .ls {
+        font-size: 0.75rem;
+        color: #9a9a9a;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .login-title {
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+      }
+      .login-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #d6d6d6;
+        border-radius: 8px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.9rem;
+        margin-bottom: 14px;
+        transition: border-color 0.2s;
+      }
+      .login-input:focus {
+        border-color: #c8102e;
+        outline: none;
+      }
+      .login-btn {
+        width: 100%;
+        padding: 12px;
+        background: #c8102e;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .login-btn:hover {
+        background: #9b0b22;
+      }
+      .login-error {
+        background: #fef0f2;
+        border: 1px solid #fbd5da;
+        color: #c8102e;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 14px;
+        display: none;
+      }
+      .login-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.8rem;
+        color: #9a9a9a;
+      }
+      @media (max-width: 480px) {
+        .login-container {
+          margin: 20px;
+          padding: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-logo">
+        <img src="img/logo-icm.png" alt="" />
+        <div class="lt">FarmaControl</div>
+        <div class="ls">Ambulatório Maanaim</div>
+      </div>
+
+      <div id="login-error" class="login-error"></div>
+
+      <form id="form-entrar" onsubmit="return fazerLogin(event);">
+        <input
+          type="text"
+          id="entrar-email"
+          class="login-input"
+          placeholder="Email ou usuário"
+          required
+        />
+        <input
+          type="password"
+          id="entrar-senha"
+          class="login-input"
+          placeholder="Senha"
+          required
+        />
+        <button type="submit" class="login-btn">Entrar</button>
+      </form>
+
+      <div class="login-footer">Ambulatório Maanaim de Divinópolis</div>
+    </div>
+
+    <script>
+      fetch("/api/auth/me").then((r) => {
+        if (r.ok) window.location.replace("/dashboard.html");
+      });
+
+      function showError(msg) {
+        const el = document.getElementById("login-error");
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+
+      async function fazerLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById("entrar-email").value.trim();
+        const senha = document.getElementById("entrar-senha").value;
+        const btn = e.target.querySelector("button[type=submit]");
+        btn.disabled = true;
+        btn.textContent = "Entrando...";
+        try {
+          const r = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha }),
+          });
+          const data = await r.json();
+          if (r.ok) {
+            window.location.replace("/dashboard.html");
+          } else {
+            showError(data.error || "Email ou senha incorretos!");
+            btn.disabled = false;
+            btn.textContent = "Entrar";
+          }
+        } catch (err) {
+          showError("Erro ao conectar com o servidor.");
+          btn.disabled = false;
+          btn.textContent = "Entrar";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relatórios - Atendimentos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/at-app.css" />
+    <script src="/js/auth.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sb">
+        <div class="sb-logo">
+          <img src="img/logo-icm.png" alt="" />
+          <div class="lt">Ambulatório Maanaim</div>
+          <div class="ls">Atendimentos</div>
+        </div>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Atendimentos</div>
+          <a href="at-dashboard.html" class="nav-item"><span class="material-icons nav-icon">dashboard</span> Dashboard</a>
+          <a href="at-fila.html" class="nav-item"><span class="material-icons nav-icon">queue</span> Fila de Espera</a>
+          <a href="at-pacientes.html" class="nav-item"><span class="material-icons nav-icon">people</span> Pacientes</a>
+          <a href="at-relatorios.html" class="nav-item active"><span class="material-icons nav-icon">assessment</span> Relatórios</a>
+        </nav>
+        <nav class="nav-sec">
+          <div class="nav-lbl">Sistema</div>
+          <a href="dashboard.html" class="nav-item"><span class="material-icons nav-icon">apps</span> Módulos</a>
+        </nav>
+        <div class="sb-user">
+          <span class="material-icons" style="font-size:1.3rem;color:rgba(255,255,255,0.7)">account_circle</span>
+          <div style="flex:1;min-width:0">
+            <div id="sb-user-nome" style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+            <div id="sb-user-tipo" style="font-size:0.62rem;color:rgba(255,255,255,0.45)">—</div>
+          </div>
+          <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.45);padding:4px" title="Sair"><span class="material-icons" style="font-size:1.1rem">logout</span></button>
+        </div>
+        <div class="sb-foot">FarmaControl v2.1</div>
+      </aside>
+      <main class="main">
+        <div id="at-rel-content"></div>
+      </main>
+    </div>
+    <script src="js/at-app.js"></script>
+    <script>
+      function initRelatorios() {
+        if (!temAcessoModulo('atendimentos')) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        atIniciarModulo().then(() => atAtualizarRelatorios());
+      }
+      
+      document.addEventListener('authReady', initRelatorios);
+      if (window.usuarioAtual) initRelatorios();
+    </script>
+  </body>
+</html>

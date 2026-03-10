@@ -1,0 +1,846 @@
+/* ============================================================
+   COMPONENTS - Material Design 3
+   Botões, Forms, Tabelas, Cards, Modal
+   ============================================================ */
+
+/* ============================================================
+   BUTTONS MD3
+   ============================================================ */
+.btn {
+  padding: 10px 24px;
+  border-radius: var(--md-radius-extra-large);
+  border: none;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn:hover::before {
+  opacity: 0.08;
+}
+
+.btn:active::before {
+  opacity: 0.12;
+}
+
+/* Filled Button (Primary) */
+.btn-p {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-elevation-1);
+}
+
+.btn-p:hover {
+  box-shadow: var(--md-elevation-2);
+  transform: translateY(-1px);
+}
+
+.btn-p:active {
+  transform: translateY(0);
+}
+
+/* Outlined Button */
+.btn-s {
+  background: transparent;
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-outline);
+}
+
+.btn-s:hover {
+  background: var(--md-state-layer);
+  border-color: var(--md-on-surface);
+}
+
+/* Text Button */
+.btn-gh {
+  background: transparent;
+  border: none;
+  color: var(--md-on-surface-variant);
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--md-radius-full);
+}
+
+.btn-gh:hover {
+  background: var(--md-state-layer);
+  color: var(--md-primary);
+}
+
+/* Small Button */
+.btn-sm {
+  padding: 6px 16px;
+  font-size: 0.8125rem;
+  border-radius: var(--md-radius-full);
+}
+
+/* Danger/Secondary Button */
+.btn-ds {
+  background: var(--md-error-container);
+  color: var(--md-error);
+  border: none;
+}
+
+.btn-ds:hover {
+  background: var(--md-error);
+  color: var(--md-on-error);
+}
+
+/* Success Button */
+.btn-gs {
+  background: var(--success-soft);
+  color: var(--success);
+  border: none;
+}
+
+.btn-gs:hover {
+  background: var(--success);
+  color: #fff;
+}
+
+/* FAB (Floating Action Button) */
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-radius-large);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border: none;
+  box-shadow: var(--md-elevation-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.fab:hover {
+  box-shadow: var(--md-elevation-4);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   FORMS MD3
+   ============================================================ */
+input,
+select,
+textarea {
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface);
+  padding: 12px 16px;
+  border-radius: var(--md-radius-small);
+  font-family: "Inter", sans-serif;
+  font-size: 0.9375rem;
+  outline: none;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--md-on-surface-variant);
+  opacity: 0.7;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--md-outline);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border: 2px solid var(--md-primary);
+  background: var(--md-surface);
+  box-shadow: 0 0 0 4px var(--md-primary-container);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--md-surface-container-low);
+  color: var(--md-on-surface-variant);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+label {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Form Field com Outline MD3 */
+.fg {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.fg input,
+.fg select,
+.fg textarea {
+  padding-top: 14px;
+  padding-bottom: 6px;
+}
+
+.fg label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9375rem;
+  color: var(--md-on-surface-variant);
+  pointer-events: none;
+  transition: all 0.2s;
+  background: transparent;
+  padding: 0 4px;
+}
+
+.fg input:focus ~ label,
+.fg input:not(:placeholder-shown) ~ label,
+.fg select:focus ~ label,
+.fg select:valid ~ label {
+  top: 0;
+  font-size: 0.6875rem;
+  color: var(--md-primary);
+  background: var(--md-surface);
+  margin-top: 0;
+}
+
+.fg input:focus ~ .fg-line,
+.fg select:focus ~ .fg-line {
+  background: var(--md-primary);
+}
+
+/* Form Grid */
+.fgrid {
+  display: grid;
+  gap: 16px;
+}
+
+.c2, .c3 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.c3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.cf {
+  grid-column: 1/-1;
+}
+
+select option {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+}
+
+/* Search */
+.sw {
+  position: relative;
+}
+
+.sw input {
+  padding-left: 44px;
+  border-radius: var(--md-radius-full);
+}
+
+.si {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--md-on-surface-variant);
+  pointer-events: none;
+  font-size: 1.25rem;
+}
+
+/* Filter Chips */
+.frow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.fc {
+  padding: 6px 16px;
+  border-radius: var(--md-radius-full);
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-container);
+  color: var(--md-on-surface-variant);
+  font-family: "Inter", sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fc:hover {
+  background: var(--md-state-layer);
+  border-color: var(--md-outline);
+}
+
+.fc.active {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-color: transparent;
+}
+
+/* Barcode Section */
+.bc-sec {
+  background: var(--md-surface-container-low);
+  border: 1px dashed var(--md-outline-variant);
+  border-radius: var(--md-radius-large);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.bc-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.bc-wrap input {
+  padding-left: 44px;
+  border-radius: var(--md-radius-full);
+}
+
+.bc-ico {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+  color: var(--md-on-surface-variant);
+}
+
+.dvd {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.dvd::before, .dvd::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--md-outline-variant);
+}
+
+.dvd span {
+  font-size: 0.6875rem;
+  color: var(--md-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   TABLES MD3
+   ============================================================ */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr {
+  background: var(--md-surface-container-low);
+}
+
+th {
+  padding: 16px;
+  text-align: left;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+  color: var(--md-on-surface-variant);
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--md-outline-variant);
+}
+
+td {
+  padding: 16px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--md-outline-variant);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr {
+  transition: background 0.15s;
+}
+
+tbody tr:hover {
+  background: var(--md-surface-container-low);
+}
+
+.tdm {
+  font-weight: 600;
+  color: var(--md-on-surface);
+}
+
+.tds {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   BADGES MD3
+   ============================================================ */
+.bdg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--md-radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.b-ok { 
+  background: var(--success-soft); 
+  color: var(--success); 
+}
+.b-low { 
+  background: var(--warning-soft); 
+  color: var(--warning); 
+}
+.b-out, .b-out2, .b-venc { 
+  background: var(--md-error-container); 
+  color: var(--md-error); 
+}
+.b-ctrl { 
+  background: #f3e5f5; 
+  color: #7b1fa2; 
+}
+.b-in { 
+  background: var(--success-soft); 
+  color: var(--success); 
+}
+
+/* ============================================================
+   CARDS MD3
+   ============================================================ */
+.cg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sc {
+  background: var(--md-surface-container-low);
+  border-radius: var(--md-radius-large);
+  padding: 20px 24px;
+  border: none;
+  box-shadow: var(--md-elevation-1);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.sc:hover { 
+  box-shadow: var(--md-elevation-2);
+  transform: translateY(-2px);
+}
+
+.sc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.sc.red::before { background: var(--md-primary); }
+.sc.warn::before { background: #f59e0b; }
+.sc.danger::before { background: var(--md-error); }
+.sc.green::before { background: #22c55e; }
+.sc.blue::before { background: #3b82f6; }
+.sc.purp::before { background: #8b5cf6; }
+
+.sc-lbl {
+  font-size: 0.6875rem;
+  color: var(--md-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sc-val {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--md-on-surface);
+  line-height: 1;
+}
+
+.sc.red .sc-val { color: var(--md-primary); }
+.sc.warn .sc-val { color: #f59e0b; }
+.sc.danger .sc-val { color: var(--md-error); }
+.sc.green .sc-val { color: #22c55e; }
+.sc.blue .sc-val { color: #3b82f6; }
+.sc.purp .sc-val { color: #8b5cf6; }
+
+.sc-sub {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant);
+  margin-top: 4px;
+}
+
+/* Panels */
+.cp {
+  background: var(--md-surface-container-low);
+  border-radius: var(--md-radius-large);
+  border: none;
+  box-shadow: var(--md-elevation-1);
+  overflow: hidden;
+}
+
+.cph {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cpt {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+/* Alerts */
+.alrt {
+  background: var(--md-error-container);
+  border: none;
+  border-radius: var(--md-radius-medium);
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+  color: var(--md-on-error-container);
+}
+
+.alrt.yel {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+/* ============================================================
+   MODAL MD3
+   ============================================================ */
+.mo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+  backdrop-filter: blur(4px);
+  padding: 24px;
+}
+
+.mo.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--md-surface);
+  border-radius: var(--md-radius-extra-large);
+  padding: 28px;
+  width: 560px;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: var(--md-elevation-5);
+}
+
+.mo.open .modal {
+  transform: translateY(0) scale(1);
+}
+
+.mh {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.mt {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.5rem;
+  color: var(--md-on-surface);
+}
+
+.mc {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--md-on-surface-variant);
+  font-size: 1.5rem;
+  padding: 8px;
+  border-radius: var(--md-radius-full);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mc:hover { 
+  background: var(--md-state-layer);
+  color: var(--md-on-surface);
+}
+
+.mf {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--md-outline-variant);
+}
+
+/* ============================================================
+   MOVEMENT ITEMS
+   ============================================================ */
+.mv-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  transition: background 0.15s;
+}
+
+.mv-item:hover { 
+  background: var(--md-surface-container-low); 
+}
+
+.mv-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-radius-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.mv-in { 
+  background: var(--success-soft); 
+  color: var(--success); 
+}
+.mv-out { 
+  background: var(--md-error-container); 
+  color: var(--md-error); 
+}
+
+.mv-nfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.mv-nm {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--md-on-surface);
+}
+
+.mv-dt {
+  font-size: 0.75rem;
+  color: var(--md-on-surface-variant);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mv-q {
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   PROGRESS BAR MD3
+   ============================================================ */
+.pb {
+  height: 8px;
+  background: var(--md-surface-container-high);
+  border-radius: var(--md-radius-full);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.pf {
+  height: 100%;
+  border-radius: var(--md-radius-full);
+  transition: width 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ============================================================
+   PAGINATION MD3
+   ============================================================ */
+.pag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--md-outline-variant);
+  justify-content: flex-end;
+}
+
+.pb2 {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--md-radius-full);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pb2:hover {
+  background: var(--md-state-layer);
+  color: var(--md-on-surface);
+}
+
+.pb2.active {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+.pb2:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.pb2:disabled:hover {
+  background: transparent;
+  color: var(--md-on-surface-variant);
+}
+
+/* ============================================================
+   TABS MD3
+   ============================================================ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--md-surface-container-low);
+  padding: 4px;
+  border-radius: var(--md-radius-full);
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 10px 24px;
+  background: transparent;
+  border: none;
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  cursor: pointer;
+  border-radius: var(--md-radius-full);
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { 
+  color: var(--md-on-surface); 
+}
+
+.tab-btn.active {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-1);
+}
+
+.tab-content { 
+  margin-bottom: 24px; 
+}
+
+/* ============================================================
+   TOAST / SNACKBAR MD3
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--md-on-surface);
+  color: var(--md-surface);
+  padding: 14px 24px;
+  border-radius: var(--md-radius-extra-large);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: var(--md-elevation-4);
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

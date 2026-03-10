@@ -1,0 +1,150 @@
+/* ============================================================
+   BASE - Variáveis MD3, Reset e Tipografia
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Cores Primárias MD3 */
+  --md-primary: #c8102e;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #ffd9db;
+  --md-on-primary-container: #410008;
+
+  /* Cores Secundárias */
+  --md-secondary: #705c5e;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #ffd9db;
+  --md-on-secondary-container: #2b1517;
+
+  /* Cores Terciárias */
+  --md-tertiary: #705c2e;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #fcdeb7;
+  --md-on-tertiary-container: #251a00;
+
+  /* Cores de Error */
+  --md-error: #ba1a1a;
+  --md-on-error: #ffffff;
+  --md-error-container: #ffdad6;
+  --md-on-error-container: #410002;
+
+  /* Cores de Superfície MD3 */
+  --md-surface: #fff8f8;
+  --md-surface-dim: #ded1d2;
+  --md-surface-bright: #fff8f8;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #f8f1f1;
+  --md-surface-container: #f2ebec;
+  --md-surface-container-high: #ede6e7;
+  --md-surface-container-highest: #e7e0e1;
+  --md-on-surface: #20191a;
+  --md-on-surface-variant: #524345;
+
+  /* Cores de Outline */
+  --md-outline: #857375;
+  --md-outline-variant: #d8c2c3;
+
+  /* Cores de Fundo */
+  --md-background: #fff8f8;
+  --md-on-background: #20191a;
+
+  /* Sombras MD3 */
+  --md-elevation-1: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-elevation-2: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.3);
+  --md-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px rgba(0, 0, 0, 0.3);
+  --md-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px rgba(0, 0, 0, 0.3);
+
+  /* Border Radius MD3 */
+  --md-radius-extra-small: 4px;
+  --md-radius-small: 8px;
+  --md-radius-medium: 12px;
+  --md-radius-large: 16px;
+  --md-radius-extra-large: 28px;
+  --md-radius-full: 9999px;
+
+  /* Cores Legadas (mantidas para compatibilidade) */
+  --red: var(--md-primary);
+  --red-dark: #9b0b22;
+  --red-soft: var(--md-error-container);
+  --red-mid: var(--md-error-container);
+  --white: #fff;
+  --off: var(--md-surface);
+  --g50: var(--md-surface-container-low);
+  --g100: var(--md-surface-container-high);
+  --g200: var(--md-outline-variant);
+  --g400: var(--md-outline);
+  --g600: var(--md-on-surface-variant);
+  --g800: var(--md-on-surface);
+  --text: var(--md-on-surface);
+  --radius: var(--md-radius-medium);
+  --sh: var(--md-elevation-1);
+  --shlg: var(--md-elevation-3);
+
+  /* Cores de Estado */
+  --md-state-layer: rgba(200, 16, 46, 0.08);
+  --md-state-layer-hover: rgba(200, 16, 46, 0.12);
+  --md-state-layer-pressed: rgba(200, 16, 46, 0.16);
+
+  /* Cores de Sucesso */
+  --success: #1e8449;
+  --success-soft: #dcfce7;
+  --success-mid: #bbf7d0;
+  --warning: #d35400;
+  --warning-soft: #fef3c7;
+  --info: #2980b9;
+  --info-soft: #dbeafe;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pt {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.6rem;
+  color: var(--md-on-surface);
+  line-height: 1.1;
+}
+
+.ps {
+  font-size: 0.78rem;
+  color: var(--md-on-surface-variant);
+  margin-top: 3px;
+}
+
+.vb { color: var(--md-primary); font-weight: 700; }
+.vs { color: var(--warning); font-weight: 600; }
+.vo { color: var(--md-on-surface-variant); }
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
