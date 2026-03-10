@@ -849,6 +849,15 @@ select option { background: var(--md-sc-lowest); }
   display: flex;
   align-items: center;
 }
+.mob-search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
 .sb-ovr {
   display: none;
   position: fixed;
