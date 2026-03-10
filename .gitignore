@@ -3,3 +3,4 @@ node_modules/
 farmacontrol.db
 *.db-shm
 *.db-wal
+nul

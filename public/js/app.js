@@ -119,6 +119,25 @@ let medicamentos = [];
 let movimentacoes = [];
 let dbLoaded = false;
 
+// Filtros de relatório
+let relFiltroDataIni = '';
+let relFiltroDataFim = '';
+let relFiltroForma = '';
+let relFiltroLocal = '';
+
+function filtrarRelatorio() {
+  relFiltroDataIni = document.getElementById('rel-data-ini')?.value || '';
+  relFiltroDataFim = document.getElementById('rel-data-fim')?.value || '';
+  relFiltroForma   = document.getElementById('rel-forma')?.value   || '';
+  relFiltroLocal   = document.getElementById('rel-local')?.value   || '';
+  renderRelatorios();
+}
+
+function limparFiltrosRelatorio() {
+  relFiltroDataIni = relFiltroDataFim = relFiltroForma = relFiltroLocal = '';
+  renderRelatorios();
+}
+
 // Cadastros
 let doadores = [];
 let fabricantes = [];
@@ -1186,93 +1205,276 @@ function renderAlertas() {
 }
 
 // ============================================================
+// EXPORTAR PDF
+// ============================================================
+function exportarPDFRelatorio() {
+  if (typeof window.jspdf === 'undefined') {
+    alert('Biblioteca jsPDF não carregada. Verifique sua conexão e recarregue a página.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+  // Filtros ativos
+  let meds = medicamentos;
+  if (relFiltroForma) meds = meds.filter(m => m.formaFarmaceutica === relFiltroForma);
+  if (relFiltroLocal) meds = meds.filter(m => m.localizacao === relFiltroLocal);
+
+  let movs = movimentacoes;
+  if (relFiltroDataIni) movs = movs.filter(m => m.data >= relFiltroDataIni);
+  if (relFiltroDataFim) movs = movs.filter(m => m.data <= relFiltroDataFim);
+
+  const tU  = meds.reduce((s, m) => s + m.qtd, 0);
+  const ent = movs.filter(m => m.tipo === 'entrada').reduce((s, m) => s + m.qtd, 0);
+  const sai = movs.filter(m => m.tipo === 'saida').reduce((s, m) => s + m.qtd, 0);
+
+  const hoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  // Cabeçalho
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(200, 16, 46); // vermelho ICM
+  doc.text('Ambulatório Maanaim de Divinópolis', 14, 16);
+
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Relatório de Estoque de Medicamentos', 14, 23);
+
+  doc.setFontSize(8.5);
+  doc.setTextColor(120, 120, 120);
+  doc.text(`Gerado em: ${hoje}`, 14, 29);
+
+  // Filtros aplicados
+  const filtrosTexto = [];
+  if (relFiltroDataIni) filtrosTexto.push(`Data inicial: ${relFiltroDataIni}`);
+  if (relFiltroDataFim) filtrosTexto.push(`Data final: ${relFiltroDataFim}`);
+  if (relFiltroForma)   filtrosTexto.push(`Forma: ${relFiltroForma}`);
+  if (relFiltroLocal)   filtrosTexto.push(`Localização: ${relFiltroLocal}`);
+  if (filtrosTexto.length > 0) {
+    doc.text('Filtros: ' + filtrosTexto.join(' · '), 14, 35);
+  }
+
+  // Linha separadora
+  const sepY = filtrosTexto.length > 0 ? 39 : 33;
+  doc.setDrawColor(220, 220, 220);
+  doc.line(14, sepY, 283, sepY);
+
+  // Resumo estatístico
+  const statY = sepY + 7;
+  const stats = [
+    { lbl: 'Itens no Estoque', val: String(meds.length) },
+    { lbl: 'Total de Unidades', val: tU.toLocaleString('pt-BR') },
+    { lbl: 'Entradas (período)', val: '+' + String(ent) },
+    { lbl: 'Saídas (período)',   val: '−' + String(sai) },
+  ];
+  const boxW = 65;
+  stats.forEach((s, i) => {
+    const x = 14 + i * (boxW + 3);
+    doc.setFillColor(248, 248, 248);
+    doc.roundedRect(x, statY - 4, boxW, 14, 2, 2, 'F');
+    doc.setFontSize(7.5);
+    doc.setTextColor(120, 120, 120);
+    doc.setFont('helvetica', 'normal');
+    doc.text(s.lbl, x + 4, statY + 1);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 40, 40);
+    doc.text(s.val, x + 4, statY + 8);
+  });
+
+  // Tabela de medicamentos
+  const tableY = statY + 19;
+  const rows = meds.map(m => {
+    const statusMap = { ok: 'Normal', low: 'Crítico', out: 'Zerado', venc: 'Vencido', ctrl: 'Controlado' };
+    const s = getStat(m);
+    return [
+      m.nomeGenerico,
+      m.nomeComercial || '—',
+      m.formaFarmaceutica || '—',
+      m.fabricante || '—',
+      m.lote || '—',
+      m.validade ? m.validade.split('-').reverse().join('/') : '—',
+      m.localizacao || '—',
+      String(m.qtd) + (m.unidade ? ' ' + m.unidade : ''),
+      String(m.minimo),
+      statusMap[s] || s,
+    ];
+  });
+
+  doc.autoTable({
+    startY: tableY,
+    head: [['Nome Genérico', 'Comercial', 'Forma', 'Fabricante', 'Lote', 'Validade', 'Local', 'Qtd.', 'Mín.', 'Status']],
+    body: rows,
+    styles: { fontSize: 7.5, cellPadding: 2.5, lineColor: [230, 230, 230], lineWidth: 0.2 },
+    headStyles: { fillColor: [200, 16, 46], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+    alternateRowStyles: { fillColor: [252, 252, 252] },
+    columnStyles: {
+      0: { cellWidth: 40 },
+      1: { cellWidth: 32 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 28 },
+      4: { cellWidth: 22 },
+      5: { cellWidth: 20 },
+      6: { cellWidth: 22 },
+      7: { cellWidth: 16, halign: 'center' },
+      8: { cellWidth: 12, halign: 'center' },
+      9: { cellWidth: 20, halign: 'center' },
+    },
+    didDrawCell(data) {
+      if (data.section === 'body' && data.column.index === 9) {
+        const val = data.cell.raw;
+        const colorMap = { 'Normal': [39, 174, 96], 'Crítico': [230, 126, 34], 'Zerado': [192, 57, 43], 'Vencido': [192, 57, 43] };
+        const c = colorMap[val];
+        if (c) {
+          doc.setTextColor(...c);
+          doc.setFont('helvetica', 'bold');
+          doc.text(val, data.cell.x + data.cell.width / 2, data.cell.y + data.cell.height / 2 + 1, { align: 'center' });
+          doc.setTextColor(40, 40, 40);
+          doc.setFont('helvetica', 'normal');
+        }
+      }
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  // Rodapé em todas as páginas
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7.5);
+    doc.setTextColor(160, 160, 160);
+    doc.setFont('helvetica', 'normal');
+    doc.text('FarmaControl · Ambulatório Maanaim de Divinópolis', 14, doc.internal.pageSize.height - 8);
+    doc.text(`Página ${i} de ${totalPages}`, 283, doc.internal.pageSize.height - 8, { align: 'right' });
+  }
+
+  const nomeArq = `relatorio-estoque-${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(nomeArq);
+}
+
+// ============================================================
 // RELATÓRIOS
 // ============================================================
 function renderRelatorios() {
   const el = document.getElementById("relatorios-content");
-  const tU = medicamentos.reduce((s, m) => s + m.qtd, 0);
-  const ent = movimentacoes
-    .filter((m) => m.tipo === "entrada")
-    .reduce((s, m) => s + m.qtd, 0);
-  const sai = movimentacoes
-    .filter((m) => m.tipo === "saida")
-    .reduce((s, m) => s + m.qtd, 0);
+
+  // Opções para selects de filtro
+  const formas  = [...new Set(medicamentos.map(m => m.formaFarmaceutica).filter(Boolean))].sort();
+  const locais  = [...new Set(medicamentos.map(m => m.localizacao).filter(Boolean))].sort();
+
+  // Aplicar filtros
+  let meds = medicamentos;
+  if (relFiltroForma) meds = meds.filter(m => m.formaFarmaceutica === relFiltroForma);
+  if (relFiltroLocal) meds = meds.filter(m => m.localizacao === relFiltroLocal);
+
+  let movs = movimentacoes;
+  if (relFiltroDataIni) movs = movs.filter(m => m.data >= relFiltroDataIni);
+  if (relFiltroDataFim) movs = movs.filter(m => m.data <= relFiltroDataFim);
+
+  const tU  = meds.reduce((s, m) => s + m.qtd, 0);
+  const ent = movs.filter(m => m.tipo === "entrada").reduce((s, m) => s + m.qtd, 0);
+  const sai = movs.filter(m => m.tipo === "saida").reduce((s, m) => s + m.qtd, 0);
 
   const fMap = {};
-  medicamentos.forEach((m) => {
-    fMap[m.formaFarmaceutica || "Outro"] =
-      (fMap[m.formaFarmaceutica || "Outro"] || 0) + m.qtd;
-  });
-  const fArr = Object.entries(fMap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  meds.forEach(m => { fMap[m.formaFarmaceutica || "Outro"] = (fMap[m.formaFarmaceutica || "Outro"] || 0) + m.qtd; });
+  const fArr = Object.entries(fMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
   const mx = fArr.length > 0 ? fArr[0][1] : 1;
 
   const lMap = {};
-  medicamentos.forEach((m) => {
-    if (m.localizacao) lMap[m.localizacao] = (lMap[m.localizacao] || 0) + 1;
-  });
+  meds.forEach(m => { if (m.localizacao) lMap[m.localizacao] = (lMap[m.localizacao] || 0) + 1; });
   const lArr = Object.entries(lMap).sort((a, b) => b[1] - a[1]);
 
-  const cols = [
-    "var(--red)",
-    "#C0392B",
-    "#E74C3C",
-    "#E67E22",
-    "#D35400",
-    "#922B21",
-    "#2980B9",
-    "#27AE60",
-  ];
+  const cols = ["var(--red)","#C0392B","#E74C3C","#E67E22","#D35400","#922B21","#2980B9","#27AE60"];
 
-  let h = `<div class="ph"><div><div class="pt">Relatórios</div><div class="ps">Análise do estoque · Ambulatório Maanaim</div></div></div>`;
+  const temFiltro = relFiltroDataIni || relFiltroDataFim || relFiltroForma || relFiltroLocal;
 
-  h += `<div class="cg" style="margin-bottom:20px">
-    <div class="sc red"><div class="sc-acc"></div><div class="sc-lbl">Itens no Sistema</div><div class="sc-val">${medicamentos.length}</div></div>
-    <div class="sc"><div class="sc-acc"></div><div class="sc-lbl">Total Unidades</div><div class="sc-val">${tU.toLocaleString("pt-BR")}</div></div>
-    <div class="sc green"><div class="sc-acc"></div><div class="sc-lbl">Total Entradas</div><div class="sc-val">+${ent}</div></div>
-    <div class="sc danger"><div class="sc-acc"></div><div class="sc-lbl">Total Saídas</div><div class="sc-val">−${sai}</div></div>
+  let h = `<div class="ph" id="rel-cabecalho">
+    <div>
+      <div class="pt">Relatórios</div>
+      <div class="ps">Análise do estoque · Ambulatório Maanaim</div>
+    </div>
+    <button class="btn btn-p" onclick="exportarPDFRelatorio()" id="rel-btn-pdf">
+      <span class="material-icons" style="font-size:1rem">picture_as_pdf</span> Exportar PDF
+    </button>
   </div>`;
 
-  h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
-    <div class="cp" style="padding:20px">
-      <div class="cpt" style="margin-bottom:14px">Por Forma Farmacêutica</div>
-      ${fArr
-        .map(
-          ([f, q], i) => `<div style="margin-bottom:10px">
+  // Filtros
+  h += `<div class="cp" style="margin-bottom:16px" id="rel-filtros">
+    <div class="cph">
+      <div class="cpt"><span class="material-icons" style="font-size:1rem">filter_list</span> Filtros</div>
+      ${temFiltro ? `<button class="btn btn-sm btn-s" onclick="limparFiltrosRelatorio()"><span class="material-icons" style="font-size:1rem">filter_alt_off</span> Limpar</button>` : ''}
+    </div>
+    <div style="padding:14px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg" style="min-width:130px;flex:1">
+        <label>Data inicial</label>
+        <input type="date" id="rel-data-ini" value="${relFiltroDataIni}" onchange="filtrarRelatorio()" />
+      </div>
+      <div class="fg" style="min-width:130px;flex:1">
+        <label>Data final</label>
+        <input type="date" id="rel-data-fim" value="${relFiltroDataFim}" onchange="filtrarRelatorio()" />
+      </div>
+      <div class="fg" style="min-width:150px;flex:1">
+        <label>Forma Farmacêutica</label>
+        <select id="rel-forma" onchange="filtrarRelatorio()">
+          <option value="">Todas</option>
+          ${formas.map(f => `<option value="${f}" ${relFiltroForma === f ? 'selected' : ''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg" style="min-width:150px;flex:1">
+        <label>Localização</label>
+        <select id="rel-local" onchange="filtrarRelatorio()">
+          <option value="">Todas</option>
+          ${locais.map(l => `<option value="${l}" ${relFiltroLocal === l ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  </div>`;
+
+  h += `<div class="cg" style="margin-bottom:20px">
+    <div class="sc red"><div class="sc-acc"></div><div class="sc-lbl">Itens</div><div class="sc-val">${meds.length}</div></div>
+    <div class="sc"><div class="sc-acc"></div><div class="sc-lbl">Total Unidades</div><div class="sc-val">${tU.toLocaleString("pt-BR")}</div></div>
+    <div class="sc green"><div class="sc-acc"></div><div class="sc-lbl">Entradas</div><div class="sc-val">+${ent}</div></div>
+    <div class="sc danger"><div class="sc-acc"></div><div class="sc-lbl">Saídas</div><div class="sc-val">−${sai}</div></div>
+  </div>`;
+
+  h += `<div class="dash-grid" style="margin-bottom:18px">
+    <div class="cp">
+      <div class="cph"><div class="cpt"><span class="material-icons" style="font-size:1rem">medication</span> Por Forma Farmacêutica</div></div>
+      <div style="padding:16px 20px">
+      ${fArr.map(([f, q], i) => `<div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;margin-bottom:3px">
           <span style="font-size:.8rem;font-weight:500">${f}</span>
           <span style="font-size:.72rem;color:var(--g400)">${q} un.</span>
         </div>
-        <div class="pb"><div class="pf" style="width:${((q / mx) * 100).toFixed(1)}%;background:${cols[i % cols.length]}"></div></div>
-      </div>`,
-        )
-        .join("")}
+        <div class="pb"><div class="pf" style="width:${((q/mx)*100).toFixed(1)}%;background:${cols[i%cols.length]}"></div></div>
+      </div>`).join("")}
+      ${fArr.length === 0 ? '<div style="text-align:center;padding:20px;color:var(--md-on-surface-variant)">Sem dados.</div>' : ''}
+      </div>
     </div>
-    <div class="cp" style="padding:20px">
-      <div class="cpt" style="margin-bottom:14px">Por Localização</div>
-      ${lArr
-        .map(
-          ([
-            l,
-            c,
-          ]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--g100)">
+    <div class="cp">
+      <div class="cph"><div class="cpt"><span class="material-icons" style="font-size:1rem">place</span> Por Localização</div></div>
+      <div style="padding:4px 0">
+      ${lArr.map(([l, c]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 20px;border-bottom:1px solid var(--g100)">
         <span style="font-size:.81rem">${l}</span>
         <span class="bdg b-ok">${c} item(s)</span>
-      </div>`,
-        )
-        .join("")}
+      </div>`).join("")}
+      ${lArr.length === 0 ? '<div style="text-align:center;padding:20px;color:var(--md-on-surface-variant)">Sem dados.</div>' : ''}
+      </div>
     </div>
   </div>`;
 
   h += `<div class="cp">
-    <div class="cph"><div class="cpt">Todos os Registros do Estoque</div></div>
+    <div class="cph">
+      <div class="cpt"><span class="material-icons" style="font-size:1rem">inventory_2</span> Registros do Estoque</div>
+      <span style="font-size:.75rem;color:var(--md-on-surface-variant)">${meds.length} item(s)</span>
+    </div>
+    <div style="overflow-x:auto">
     <table><thead><tr><th>Nome Genérico</th><th>Nome Comercial</th><th>Forma</th><th>Fabricante</th><th>Lote</th><th>Validade</th><th>Local</th><th>Origem</th><th>Qtd.</th><th>Mínimo</th><th>Status</th></tr></thead>
-    <tbody>${medicamentos
-      .map((m) => {
-        const s = getStat(m);
-        const deficit = m.qtd < m.minimo ? m.minimo - m.qtd : 0;
-        return `<tr>
+    <tbody>${meds.map(m => {
+      const s = getStat(m);
+      const deficit = m.qtd < m.minimo ? m.minimo - m.qtd : 0;
+      return `<tr>
         <td data-label="Nome Genérico"><div class="tdm">${m.nomeGenerico}</div>${m.controlado ? '<span class="bdg b-ctrl">CTRL</span>' : ""}</td>
         <td data-label="Nome Comercial" style="font-size:.78rem">${m.nomeComercial || "—"}</td>
         <td data-label="Forma" style="font-size:.77rem">${m.formaFarmaceutica || "—"}</td>
@@ -1288,8 +1490,8 @@ function renderRelatorios() {
         </td>
         <td data-label="Status">${sBadge(s)}</td>
       </tr>`;
-      })
-      .join("")}</tbody></table>
+    }).join("")}</tbody></table>
+    </div>
   </div>`;
 
   el.innerHTML = h;

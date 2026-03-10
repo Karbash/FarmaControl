@@ -954,6 +954,22 @@ select option { background: var(--md-sc-lowest); }
   .btn-sm { height: 28px; padding: 0 10px; font-size: .7rem; }
 }
 
+/* ── Print (Exportar PDF) ───────────────────────────────────── */
+@media print {
+  .sb, #rel-filtros, #rel-btn-pdf, .mob-bar, .sb-ovr { display: none !important; }
+  #app { display: block !important; }
+  .main { padding: 12px !important; max-width: 100% !important; }
+  .cp { border: 1px solid #ddd !important; break-inside: avoid; margin-bottom: 12px; }
+  .cph { background: #f5f5f5 !important; border-bottom: 1px solid #ddd !important; }
+  .sc { border: 1px solid #ddd !important; }
+  body, .main { background: #fff !important; }
+  table { font-size: .72rem !important; }
+  th { background: #f5f5f5 !important; color: #000 !important; }
+  .dash-grid { grid-template-columns: 1fr 1fr !important; }
+  #rel-cabecalho .pt::after { content: " — Ambulatório Maanaim de Divinópolis"; font-size: .9rem; color: #555; }
+  a { text-decoration: none !important; }
+}
+
 /* ── Modal custom classes ───────────────────────────────────── */
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .modal-title { font-size: 1.2rem; font-weight: 600; color: var(--md-on-surface); }
