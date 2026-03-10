@@ -106,7 +106,9 @@
               </div>
               <div class="fg" id="s2-paciente-group" style="display:none">
                 <label>Nome do Paciente</label>
-                <input type="text" id="s2-paciente" placeholder="Nome do paciente" />
+                <select id="s2-paciente">
+                  <option value="">Selecione...</option>
+                </select>
               </div>
               <div class="fg">
                 <label>Data da Baixa *</label>
@@ -114,7 +116,9 @@
               </div>
               <div class="fg cf">
                 <label>Responsável pela Baixa *</label>
-                <input type="text" id="s2-resp" placeholder="Nome completo" />
+                <select id="s2-resp">
+                  <option value="">Selecione...</option>
+                </select>
               </div>
             </div>
             <div id="s2-err" style="color:var(--red);font-size:0.76rem;margin-top:10px;display:none;padding:8px 12px;background:var(--red-soft);border-radius:6px"></div>
@@ -202,13 +206,50 @@
 
       document.addEventListener('authReady', function() {
         carregarPrescricoesPendentes();
-        const resp = document.getElementById('s2-resp');
-        if (resp && window.usuarioAtual?.nome) resp.value = window.usuarioAtual.nome;
+        popularSelectResponsavelSaida();
+        popularSelectPacientes();
       });
       if (window.usuarioAtual) {
         carregarPrescricoesPendentes();
-        const resp = document.getElementById('s2-resp');
-        if (resp && window.usuarioAtual.nome) resp.value = window.usuarioAtual.nome;
+        popularSelectResponsavelSaida();
+        popularSelectPacientes();
+      }
+
+      async function popularSelectResponsavelSaida() {
+        const sel = document.getElementById('s2-resp');
+        if (!sel) return;
+        try {
+          let lista = [];
+          if (usuarios && usuarios.length > 0) {
+            lista = usuarios;
+          } else {
+            lista = await dbBuscarUsuarios();
+          }
+          const opts = lista.map((u) => `<option value="${u.nome}">${u.nome}</option>`).join("");
+          sel.innerHTML = '<option value="">Selecione...</option>' + opts;
+          if (window.usuarioAtual?.nome) {
+            sel.value = window.usuarioAtual.nome;
+          }
+        } catch (e) {
+          if (window.usuarioAtual?.nome) {
+            sel.innerHTML = `<option value="">Selecione...</option><option value="${window.usuarioAtual.nome}">${window.usuarioAtual.nome}</option>`;
+            sel.value = window.usuarioAtual.nome;
+          }
+        }
+      }
+
+      async function popularSelectPacientes() {
+        const sel = document.getElementById('s2-paciente');
+        if (!sel) return;
+        try {
+          const r = await fetch('/api/pacientes');
+          if (!r.ok) throw new Error(r.status);
+          const lista = await r.json();
+          const opts = lista.map((p) => `<option value="${p.nome}">${p.nome}</option>`).join("");
+          sel.innerHTML = '<option value="">Selecione...</option>' + opts;
+        } catch (e) {
+          sel.innerHTML = '<option value="">Erro ao carregar pacientes</option>';
+        }
       }
     </script>
   </body>

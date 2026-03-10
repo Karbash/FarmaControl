@@ -941,10 +941,15 @@ async function atIniciarModulo() {
 }
 
 // Inicializa componentes de UI ao carregar qualquer página at-*
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    _atInitBuscaGlobal();
+    _atInitMobileBar();
+  });
+} else {
   _atInitBuscaGlobal();
   _atInitMobileBar();
-});
+}
 
 // ============================================================
 // BARRA MOBILE (injeta .mob-bar e overlay em todas as páginas)
@@ -973,13 +978,16 @@ function _atInitMobileBar() {
   const bar = document.createElement('div');
   bar.className = 'mob-bar';
   bar.innerHTML = `
-    <button class="sb-tog" onclick="_atToggleSb()" aria-label="Menu">
+    <button class="sb-tog" aria-label="Menu">
       <span class="material-icons">menu</span>
     </button>
     <div class="mob-ttl">${title}</div>
-    <button onclick="_atAbrirBuscaGlobal()" style="background:none;border:none;cursor:pointer;color:#fff;padding:2px;display:flex;align-items:center" aria-label="Buscar paciente">
+    <button class="mob-search-btn" aria-label="Buscar paciente">
       <span class="material-icons">person_search</span>
     </button>`;
+  
+  bar.querySelector('.sb-tog').onclick = _atToggleSb;
+  bar.querySelector('.mob-search-btn').onclick = _atAbrirBuscaGlobal;
 
   const app = document.getElementById('app');
   if (app) app.before(bar);
@@ -1024,9 +1032,15 @@ function _atInitBuscaGlobal() {
 }
 
 function _atAbrirBuscaGlobal() {
+  console.log('Abrindo busca global...');
   const modal = document.getElementById('at-modal-busca-global');
-  if (!modal) return;
-  modal.style.display = 'flex';
+  if (!modal) {
+    console.log('Modal não encontrado, inicializando...');
+    _atInitBuscaGlobal();
+  }
+  const m = document.getElementById('at-modal-busca-global');
+  if (!m) return;
+  m.style.display = 'flex';
   const inp = document.getElementById('at-bg-input');
   if (inp) { inp.value = ''; inp.focus(); }
   _atBuscaGlobalFiltrar();

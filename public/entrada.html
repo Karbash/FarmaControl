@@ -298,8 +298,8 @@
       popularSelectFabricantes();
       popularSelectLocais();
       popularSelectOrigem();
-      popularSelectResponsavel();
       popularSelectVincular();
+      document.addEventListener('authReady', () => popularSelectResponsavel());
     </script>
   </body>
 </html>

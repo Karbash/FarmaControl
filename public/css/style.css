@@ -372,12 +372,13 @@ th {
   white-space: nowrap;
 }
 td {
-  padding: 11px 14px;
+  padding: 16px 20px;
   font-size: .82rem;
   border-top: 1px solid var(--md-outline-variant);
   vertical-align: middle;
   color: var(--md-on-surface);
 }
+td.padded { padding: 16px 20px; }
 tr:hover td { background: var(--md-state-surface); }
 .tdm { font-weight: 600; color: var(--md-on-surface); }
 .tds { font-size: .7rem; color: var(--md-on-surface-variant); margin-top: 1px; }
@@ -892,7 +893,7 @@ select option { background: var(--md-sc-lowest); }
   .cp thead tr { position: absolute; top: -9999px; left: -9999px; }
   .cp td {
     position: relative;
-    padding-left: 50%;
+    padding: 14px 16px 14px 50%;
     border: none;
     border-bottom: 1px solid var(--md-outline-variant);
   }
