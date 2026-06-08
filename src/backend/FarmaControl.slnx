@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="FarmaControl.Api/FarmaControl.Api.csproj" />
+  <Project Path="FarmaControl.Application/FarmaControl.Application.csproj" />
+  <Project Path="FarmaControl.Contracts/FarmaControl.Contracts.csproj" />
+  <Project Path="FarmaControl.Domain/FarmaControl.Domain.csproj" />
+  <Project Path="FarmaControl.Infrastructure/FarmaControl.Infrastructure.csproj" />
+  <Project Path="FarmaControl.Tests/FarmaControl.Tests.csproj" />
+</Solution>

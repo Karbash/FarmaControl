@@ -1,0 +1,103 @@
+using Microsoft.Extensions.DependencyInjection;
+using FarmaControl.Application.Abstractions;
+using FarmaControl.Application.Audit.Models;
+using FarmaControl.Application.Audit.UseCases;
+using FarmaControl.Application.Care.Appointments.Models;
+using FarmaControl.Application.Care.Appointments.UseCases;
+using FarmaControl.Application.Care.Cid10;
+using FarmaControl.Application.Care.MedicalAttendances.Models;
+using FarmaControl.Application.Care.MedicalAttendances.UseCases;
+using FarmaControl.Application.Care.MedicalRecords.Models;
+using FarmaControl.Application.Care.MedicalRecords.UseCases;
+using FarmaControl.Application.Care.Patients.Models;
+using FarmaControl.Application.Care.Patients.UseCases;
+using FarmaControl.Application.Care.Prescriptions.Models;
+using FarmaControl.Application.Care.Prescriptions.UseCases;
+using FarmaControl.Application.Care.Triage.Models;
+using FarmaControl.Application.Care.Triage.UseCases;
+using FarmaControl.Application.Inventory.Models;
+using FarmaControl.Application.Inventory.UseCases;
+using FarmaControl.Application.Users.Models;
+using FarmaControl.Application.Users.UseCases;
+using FarmaControl.Contracts.Auth;
+using FarmaControl.Contracts.Audit;
+using FarmaControl.Contracts.Care;
+using FarmaControl.Contracts.Inventory;
+using FarmaControl.Contracts.Users;
+
+namespace FarmaControl.Application;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddApplication(this IServiceCollection services)
+    {
+        services.AddScoped<IUseCase<LoginModel, Result<AuthenticatedUserResponse>>, LoginUseCase>();
+        services.AddScoped<IUseCase<ChangePasswordModel, Result<AuthenticatedUserResponse>>, ChangePasswordUseCase>();
+        services.AddScoped<IUseCase<ChangeSignaturePasswordModel, Result<AuthenticatedUserResponse>>, ChangeSignaturePasswordUseCase>();
+        services.AddScoped<IUseCase<AuditLogFilterModel, Result<IReadOnlyList<AuditLogResponse>>>, ListAuditLogsUseCase>();
+        services.AddScoped<IUseCase<GenerateAuditReportPdfRequest, Result<AuditReportPdfResponse>>, GenerateAuditReportPdfUseCase>();
+        services.AddScoped<IUseCase<GetCurrentUserRequest, Result<AuthenticatedUserResponse>>, GetCurrentUserUseCase>();
+        services.AddScoped<IUseCase<GetUserRequest, Result<UserResponse>>, GetUserUseCase>();
+        services.AddScoped<IUseCase<ListUsersRequest, IReadOnlyList<UserResponse>>, ListUsersUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<CareTeamUserResponse>>, ListCareTeamUseCase>();
+        services.AddScoped<IUseCase<ListResponsibleUsersRequest, IReadOnlyList<ResponsibleUserResponse>>, ListResponsibleUsersUseCase>();
+        services.AddScoped<IUseCase<CreateUserCommand, Result<UserResponse>>, CreateUserUseCase>();
+        services.AddScoped<IUseCase<UpdateUserCommand, Result<UserResponse>>, UpdateUserUseCase>();
+        services.AddScoped<IUseCase<SoftDeleteUserCommand, Result<UserResponse>>, SoftDeleteUserUseCase>();
+        services.AddScoped<IUseCase<RevokeUserAccessModel, Result<UserResponse>>, RevokeUserAccessUseCase>();
+        services.AddScoped<IUseCase<RestoreUserAccessCommand, Result<UserResponse>>, RestoreUserAccessUseCase>();
+        services.AddScoped<IUseCase<ResetSignaturePasswordCommand, Result<UserResponse>>, ResetSignaturePasswordUseCase>();
+        services.AddScoped<IUseCase<GrantUserModuleCommand, Result<UserResponse>>, GrantUserModuleUseCase>();
+        services.AddScoped<IUseCase<RevokeUserModuleModel, Result<UserResponse>>, RevokeUserModuleUseCase>();
+        services.AddScoped<IUseCase<ListPatientsRequest, IReadOnlyList<PatientResponse>>, ListPatientsUseCase>();
+        services.AddScoped<IUseCase<GetPatientRequest, Result<PatientResponse>>, GetPatientUseCase>();
+        services.AddScoped<IUseCase<PatientInputModel, Result<PatientResponse>>, CreatePatientUseCase>();
+        services.AddScoped<IUseCase<UpdatePatientCommand, Result<PatientResponse>>, UpdatePatientUseCase>();
+        services.AddScoped<IUseCase<DeletePatientCommand, Result<bool>>, DeletePatientUseCase>();
+        services.AddScoped<IUseCase<ListAppointmentsRequest, IReadOnlyList<AppointmentResponse>>, ListAppointmentsUseCase>();
+        services.AddScoped<IUseCase<GetAppointmentRequest, Result<AppointmentResponse>>, GetAppointmentUseCase>();
+        services.AddScoped<IUseCase<AppointmentInputModel, Result<AppointmentResponse>>, CreateAppointmentUseCase>();
+        services.AddScoped<IUseCase<UpdateAppointmentCommand, Result<AppointmentResponse>>, UpdateAppointmentUseCase>();
+        services.AddScoped<IUseCase<UpdateAppointmentStatusCommand, Result<AppointmentResponse>>, UpdateAppointmentStatusUseCase>();
+        services.AddScoped<IUseCase<DeleteAppointmentCommand, Result<bool>>, DeleteAppointmentUseCase>();
+        services.AddScoped<IUseCase<ListTriageRecordsRequest, Result<IReadOnlyList<TriageRecordResponse>>>, ListTriageRecordsUseCase>();
+        services.AddScoped<IUseCase<TriageRecordInputModel, Result<TriageRecordResponse>>, CreateTriageRecordUseCase>();
+        services.AddScoped<IUseCase<UpdateTriageRecordCommand, Result<TriageRecordResponse>>, UpdateTriageRecordUseCase>();
+        services.AddScoped<IUseCase<ListMedicalRecordsRequest, IReadOnlyList<MedicalRecordResponse>>, ListMedicalRecordsUseCase>();
+        services.AddScoped<IUseCase<GetMedicalRecordRequest, Result<MedicalRecordResponse>>, GetMedicalRecordUseCase>();
+        services.AddScoped<IUseCase<MedicalRecordInputModel, Result<MedicalRecordResponse>>, CreateMedicalRecordUseCase>();
+        services.AddScoped<IUseCase<UpdateMedicalRecordCommand, Result<MedicalRecordResponse>>, UpdateMedicalRecordUseCase>();
+        services.AddScoped<IUseCase<SearchCid10Request, IReadOnlyList<Cid10Response>>, SearchCid10UseCase>();
+        services.AddScoped<IUseCase<ListPrescriptionsRequest, IReadOnlyList<PrescriptionResponse>>, ListPrescriptionsUseCase>();
+        services.AddScoped<IUseCase<PrescriptionInputModel, Result<PrescriptionResponse>>, CreatePrescriptionUseCase>();
+        services.AddScoped<IUseCase<DeletePrescriptionCommand, Result<bool>>, DeletePrescriptionUseCase>();
+        services.AddScoped<IUseCase<DispensePrescriptionModel, Result<DispensePrescriptionResponse>>, DispensePrescriptionUseCase>();
+        services.AddScoped<IUseCase<GetMedicalAttendanceRequest, Result<MedicalAttendanceResponse>>, GetMedicalAttendanceUseCase>();
+        services.AddScoped<IUseCase<GetMedicalAttendanceByAppointmentRequest, Result<MedicalAttendanceResponse>>, GetMedicalAttendanceByAppointmentUseCase>();
+        services.AddScoped<IUseCase<CreateMedicalAttendanceCommand, Result<MedicalAttendanceResponse>>, CreateMedicalAttendanceUseCase>();
+        services.AddScoped<IUseCase<UpdateMedicalAttendanceCommand, Result<MedicalAttendanceResponse>>, UpdateMedicalAttendanceUseCase>();
+        services.AddScoped<IUseCase<GenerateMedicalAttendancePdfRequest, Result<MedicalAttendancePdfResponse>>, GenerateMedicalAttendancePdfUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<MedicationResponse>>, ListMedicationsUseCase>();
+        services.AddScoped<IUseCase<GetMedicationRequest, Result<MedicationResponse>>, GetMedicationUseCase>();
+        services.AddScoped<IUseCase<CreateMedicationCommand, Result<MedicationResponse>>, CreateMedicationUseCase>();
+        services.AddScoped<IUseCase<UpdateMedicationCommand, Result<MedicationResponse>>, UpdateMedicationUseCase>();
+        services.AddScoped<IUseCase<DeleteMedicationCommand, Result<bool>>, DeleteMedicationUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<StockMovementResponse>>, ListStockMovementsUseCase>();
+        services.AddScoped<IUseCase<StockMovementInputModel, Result<StockMovementResponse>>, CreateStockMovementUseCase>();
+        services.AddScoped<IUseCase<TransferMedicationModel, Result<TransferMedicationResponse>>, TransferMedicationUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<DonorResponse>>, ListDonorsUseCase>();
+        services.AddScoped<IUseCase<CreateDonorModel, Result<DonorResponse>>, CreateDonorUseCase>();
+        services.AddScoped<IUseCase<UpdateDonorCommand, Result<DonorResponse>>, UpdateDonorUseCase>();
+        services.AddScoped<IUseCase<DeleteDonorCommand, Result<bool>>, DeleteDonorUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<ManufacturerResponse>>, ListManufacturersUseCase>();
+        services.AddScoped<IUseCase<CreateManufacturerModel, Result<ManufacturerResponse>>, CreateManufacturerUseCase>();
+        services.AddScoped<IUseCase<UpdateManufacturerCommand, Result<ManufacturerResponse>>, UpdateManufacturerUseCase>();
+        services.AddScoped<IUseCase<DeleteManufacturerCommand, Result<bool>>, DeleteManufacturerUseCase>();
+        services.AddScoped<IUseCase<NoRequest, IReadOnlyList<StockLocationResponse>>, ListStockLocationsUseCase>();
+        services.AddScoped<IUseCase<CreateStockLocationModel, Result<StockLocationResponse>>, CreateStockLocationUseCase>();
+        services.AddScoped<IUseCase<UpdateStockLocationCommand, Result<StockLocationResponse>>, UpdateStockLocationUseCase>();
+        services.AddScoped<IUseCase<DeleteStockLocationCommand, Result<bool>>, DeleteStockLocationUseCase>();
+
+        return services;
+    }
+}
